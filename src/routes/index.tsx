@@ -58,7 +58,7 @@ function toFrames(steps: Step[]): Frame[] {
           verified: false,
           word: null,
           video: null,
-          lookupUrl: OFFICIAL_ISL_LOOKUPS[s.source.toLowerCase()]?.url ?? "https://divyangjan.depwd.gov.in/islrtc/",
+          lookupUrl: `https://www.youtube.com/@islrtc/search?query=${encodeURIComponent(s.source)}`,
         })),
   );
 }
@@ -165,12 +165,13 @@ function Index() {
                 <span className="font-display text-6xl text-foreground">{cur.big}</span>
                 <p className="font-semibold text-foreground">Look up “{cur.word ?? cur.label}” in the official dictionary</p>
                 <p className="max-w-md text-sm text-muted-foreground">This word does not have a locally verified dictionary video. Search the full ISLRTC collection for its official video and any alternate meanings.</p>
-                <form className="flex w-full max-w-md gap-2" onSubmit={(e) => { e.preventDefault(); if (officialQuery.trim()) window.open("https://divyangjan.depwd.gov.in/islrtc/", "_blank", "noopener,noreferrer"); }}>
-                  <input className="field min-w-0 flex-1" value={officialQuery || cur.word || cur.label} onChange={(e) => setOfficialQuery(e.target.value)} aria-label="Word to search in the official ISL dictionary" placeholder="Search an ISL word…" />
-                  <button className="btn-primary" type="submit">Search ↗</button>
+                <form className="flex w-full max-w-md gap-2" onSubmit={(e) => { e.preventDefault(); const term = (officialQuery.trim() || cur.word || cur.label).replace(/^Spell ["“]|["”] ·.*$/g, "").trim(); if (term) window.open(`https://www.youtube.com/@islrtc/search?query=${encodeURIComponent(term)}`, "_blank", "noopener,noreferrer"); }}>
+                  <input className="field min-w-0 flex-1" value={officialQuery || cur.word || cur.label} onChange={(e) => setOfficialQuery(e.target.value)} aria-label="Search official ISLRTC sign videos" placeholder="Search a word or phrase…" />
+                  <button className="btn-primary" type="submit">Find videos ↗</button>
                 </form>
-                <a className="chip" href="https://divyangjan.depwd.gov.in/islrtc/" target="_blank" rel="noreferrer">Open official ISLRTC dictionary ↗</a>
-                <p className="max-w-md text-xs text-muted-foreground">The official site may block embedding, so it opens separately when you select Search. Enter the word in its dictionary search box.</p>
+                <a className="chip" href={`https://www.youtube.com/@islrtc/search?query=${encodeURIComponent(cur.word || cur.label)}`} target="_blank" rel="noreferrer">Search this word in ISLRTC videos ↗</a>
+                <a className="chip" href="https://divyangjan.depwd.gov.in/islrtc/" target="_blank" rel="noreferrer">Open official dictionary website ↗</a>
+                <p className="max-w-md text-xs text-muted-foreground">Search opens results on the ISLRTC YouTube channel. Choose the relevant meaning and check that the video is from ISLRTC; a word may have several signs. External search results cannot be guaranteed or embedded automatically.</p>
               </div>
             ) : (
               <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Select a message to explore a dictionary clip or an illustrative 3D gesture</div>
@@ -214,6 +215,8 @@ function Index() {
             <p className="text-sm font-semibold text-foreground">Original message (keep this visible)</p>
             <p className="text-lg text-foreground break-words">{text}</p>
             <p className="text-sm text-muted-foreground">This sequence is word-by-word assistance, not a validated ISL sentence. Grammar, negation, questions, names, and context may need a fluent signer.</p>
+            <a className="chip inline-flex" href={`https://www.youtube.com/@islrtc/search?query=${encodeURIComponent(text.trim())}`} target="_blank" rel="noreferrer">Search official ISLRTC videos for the whole message ↗</a>
+            <p className="text-xs text-muted-foreground">If there is no exact sentence result, search important words separately. ISL does not always follow English word order.</p>
             <label className="flex items-center gap-2 text-sm text-foreground">
               <input type="checkbox" checked={slowPlayback} onChange={(e) => setSlowPlayback(e.target.checked)} />
               Slower playback
