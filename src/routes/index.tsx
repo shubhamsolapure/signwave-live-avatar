@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
 type Frame = { label: string; big: string; how: string; verified: boolean };
 
 function toFrames(steps: Step[]): Frame[] {
-  return steps.flatMap((s) =>
+  return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
       ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true }]
       : s.letters.map((l, i) => ({
