@@ -124,7 +124,7 @@ function Index() {
               <span className={cur.verified ? "badge-verified" : "badge-spell"}>{cur.verified ? "✓ Official ISLRTC sign" : "Fingerspelling"}</span>
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
-              <p className="text-muted-foreground">{cur.how}</p>
+              {!(mode === "real" && cur.verified) && <p className="text-muted-foreground">{cur.how}</p>}
               <div className="flex w-full items-center gap-2 pt-2">
                 <button className="btn-ghost" onClick={() => { setPlaying(false); setIdx((i) => Math.max(0, i - 1)); }}>‹</button>
                 <div className="h-2 flex-1 rounded-full bg-muted"><div className="h-2 rounded-full bg-primary transition-all" style={{ width: `${((idx + 1) / frames.length) * 100}%` }} /></div>
