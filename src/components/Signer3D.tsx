@@ -58,7 +58,7 @@ export const POSES: Record<string, Pose> = {
   Today: { ...P(FRONT, "open", "nod", mirror(FRONT)), both: true },
   Understand: P([-0.9, 0.2, -2.4], "point", "tap"),
 };
-export const SPELL_POSE: Pose = { ...P([-0.7, 0.3, -1.5], "point", "none", [-0.7, 0.3, -1.5]), both: true };
+// Unknown words use a neutral two-hand presentation pose. This is not a substitute for the correct ISL alphabet handshape for each letter.\nexport const SPELL_POSE: Pose = { ...P([-0.7, 0.3, -1.5], "point", "none", [-0.7, 0.3, -1.5]), both: true };
 export const IDLE_POSE: Pose = P(REST, "open", "none");
 
 const SKIN = "#c68a62";
@@ -150,12 +150,12 @@ function ArmRig({ side, poseRef }: { side: 1 | -1; poseRef: React.MutableRefObje
     const t = clock.elapsedTime;
     const m = active ? p.move : "none";
     let dx = 0, dz = 0, de = 0;
-    if (m === "wave") dz = Math.sin(t * 9) * 0.18;
-    if (m === "nod") de = Math.sin(t * 8) * 0.22;
-    if (m === "tap") de = Math.abs(Math.sin(t * 7)) * -0.2;
-    if (m === "circle") { dx = Math.sin(t * 5) * 0.12; dz = Math.cos(t * 5) * 0.12; }
-    if (m === "forward") dx = -((Math.sin(t * 3) + 1) / 2) * 0.35;
-    const k = 0.12;
+    if (m === "wave") dz = Math.sin(t * 9) * 0.28;
+    if (m === "nod") de = Math.sin(t * 8) * 0.3;
+    if (m === "tap") de = Math.abs(Math.sin(t * 7)) * -0.28;
+    if (m === "circle") { dx = Math.sin(t * 5) * 0.2; dz = Math.cos(t * 5) * 0.2; }
+    if (m === "forward") dx = -((Math.sin(t * 3) + 1) / 2) * 0.45;
+    const k = 0.18;
     if (shoulder.current) {
       shoulder.current.rotation.x = THREE.MathUtils.lerp(shoulder.current.rotation.x, a[0] + dx, k);
       shoulder.current.rotation.z = THREE.MathUtils.lerp(shoulder.current.rotation.z, (a[1] + dz) * side, k);
