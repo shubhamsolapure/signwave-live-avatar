@@ -58,7 +58,7 @@ function toFrames(steps: Step[]): Frame[] {
           verified: false,
           word: null,
           video: null,
-          lookupUrl: OFFICIAL_ISL_LOOKUPS[s.source.toLowerCase()]?.url ?? null,
+          lookupUrl: OFFICIAL_ISL_LOOKUPS[s.source.toLowerCase()]?.url ?? "https://divyangjan.depwd.gov.in/islrtc/",
         })),
   );
 }
@@ -169,7 +169,7 @@ function Index() {
               {!(mode === "real" && cur.verified) && <p className="text-muted-foreground">{cur.how}</p>}
               {cur.lookupUrl && (
                 <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">
-                  Open official ISLRTC entry ↗
+                  Find this word in official ISLRTC dictionary ↗
                 </a>
               )}
               <div className="flex w-full items-center gap-2 pt-2">
