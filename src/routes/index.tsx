@@ -69,7 +69,7 @@ function Index() {
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [listening, setListening] = useState(false);
-  const [mode, setMode] = useState<"real" | "avatar">("avatar");
+  const [mode, setMode] = useState<"real" | "avatar">("real");
   const [micOk, setMicOk] = useState(true);
   const [slowPlayback, setSlowPlayback] = useState(false);
   const [phraseQuery, setPhraseQuery] = useState("");
