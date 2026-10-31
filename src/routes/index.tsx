@@ -175,6 +175,13 @@ function Index() {
           </div>
         </section>
 
+        <section className="rounded-2xl border bg-card p-4 space-y-2">
+          <h2 className="text-xl font-display text-foreground">Explore the full official ISL dictionary</h2>
+          <p className="text-sm text-muted-foreground">This project currently contains a small local set of linked dictionary clips. ISLRTC’s Government of India dictionary provides a much larger searchable collection, including everyday, academic, medical, legal, technical, and regional vocabulary.</p>
+          <a className="btn-primary inline-flex items-center justify-center gap-2" href="https://divyangjan.depwd.gov.in/islrtc/" target="_blank" rel="noreferrer">Search official ISLRTC dictionary ↗</a>
+          <p className="text-xs text-muted-foreground">The official dictionary opens separately. Its full catalogue is not automatically copied into this app, and only individually sourced clips are counted in the local dictionary.</p>
+        </section>
+
         <section className="rounded-2xl border bg-card p-4 space-y-4">
           <div>
             <h2 className="text-xl font-display text-foreground">Everyday phrase library</h2>
@@ -196,7 +203,7 @@ function Index() {
         </section>
 
         <details className="rounded-2xl border bg-card p-4">
-          <summary className="cursor-pointer font-semibold text-foreground">Dictionary clips listed ({new Set(Object.values(APPROVED_SIGNS).map((s) => s.word)).size} signs)</summary>
+          <summary className="cursor-pointer font-semibold text-foreground">Local dictionary clips ({new Set(Object.values(APPROVED_SIGNS).map((s) => s.word)).size} signs)</summary>
           <div className="mt-3 flex flex-wrap gap-2">
             {[...new Set(Object.values(APPROVED_SIGNS).map((s) => s.word))].map((w) => <span key={w} className="chip">{w}</span>)}
           </div>
