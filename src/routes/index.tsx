@@ -8,9 +8,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Saanjh — Voice & Text to Indian Sign Language" },
-      { name: "description", content: "Speak or type and see verified Indian Sign Language signs, with fingerspelling for everything else." },
+      { name: "description", content: "Explore Indian Sign Language dictionary clips and fingerspelling for typed or spoken text." },
       { property: "og:title", content: "Saanjh — Voice & Text to ISL" },
-      { property: "og:description", content: "Verified ISL signs from speech or text for deaf communication." },
+      { property: "og:description", content: "A prototype for exploring ISL dictionary clips and fingerspelling from speech or text." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -43,6 +43,7 @@ function Index() {
   const [listening, setListening] = useState(false);
   const [mode, setMode] = useState<"real" | "avatar">("real");
   const [micOk, setMicOk] = useState(true);
+  const [slowPlayback, setSlowPlayback] = useState(false);
   const recRef = useRef<any>(null);
 
   useEffect(() => {
@@ -59,9 +60,9 @@ function Index() {
   useEffect(() => {
     if (!playing) return;
     if (idx >= frames.length - 1) return setPlaying(false);
-    const t = setTimeout(() => setIdx((i) => i + 1), frames[idx]?.verified ? (mode === "real" ? 5000 : 2200) : 1100);
+    const t = setTimeout(() => setIdx((i) => i + 1), (frames[idx]?.verified ? (mode === "real" ? 5000 : 2200) : 1100) * (slowPlayback ? 1.8 : 1));
     return () => clearTimeout(t);
-  }, [playing, idx, frames, mode]);
+  }, [playing, idx, frames, mode, slowPlayback]);
 
   const go = (t = text) => {
     const f = toFrames(translate(t));
@@ -88,7 +89,7 @@ function Index() {
         <header>
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">Saanjh</p>
           <h1 className="font-display text-4xl leading-tight text-foreground">Speak or type.<br />See it in sign.</h1>
-          <p className="mt-2 text-muted-foreground">Indian Sign Language shown by real signers from the official ISLRTC dictionary. Unknown words are fingerspelled — never guessed.</p>
+          <p className="mt-2 text-muted-foreground">Explore ISL dictionary clips and fingerspelling. This prototype is not a validated sentence-level ISL translator; keep the original caption visible and confirm meaning with a fluent ISL signer.</p>
         </header>
 
         <div className="mode-toggle" role="tablist">
@@ -121,7 +122,7 @@ function Index() {
         <section className="stage" aria-live="polite">
           {cur ? (
             <>
-              <span className={cur.verified ? "badge-verified" : "badge-spell"}>{cur.verified ? "✓ Official ISLRTC sign" : "Fingerspelling"}</span>
+              <span className={cur.verified ? "badge-verified" : "badge-spell"}>{cur.verified ? "Dictionary video available · check clip" : "Fingerspelling"}</span>
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
               {!(mode === "real" && cur.verified) && <p className="text-muted-foreground">{cur.how}</p>}
@@ -137,6 +138,18 @@ function Index() {
           )}
         </section>
 
+        {frames.length > 0 && (
+          <section className="rounded-2xl border bg-card p-4 space-y-2" aria-live="polite">
+            <p className="text-sm font-semibold text-foreground">Original message (keep this visible)</p>
+            <p className="text-lg text-foreground break-words">{text}</p>
+            <p className="text-sm text-muted-foreground">This sequence is word-by-word assistance, not a validated ISL sentence. Grammar, negation, questions, names, and context may need a fluent signer.</p>
+            <label className="flex items-center gap-2 text-sm text-foreground">
+              <input type="checkbox" checked={slowPlayback} onChange={(e) => setSlowPlayback(e.target.checked)} />
+              Slower playback
+            </label>
+          </section>
+        )}
+
         <section className="space-y-3">
           <textarea className="field" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="Type a message…" />
           <div className="flex gap-3">
@@ -150,7 +163,7 @@ function Index() {
         </section>
 
         <details className="rounded-2xl border bg-card p-4">
-          <summary className="cursor-pointer font-semibold text-foreground">Verified sign dictionary ({new Set(Object.values(APPROVED_SIGNS).map((s) => s.word)).size} signs)</summary>
+          <summary className="cursor-pointer font-semibold text-foreground">Dictionary clips listed ({new Set(Object.values(APPROVED_SIGNS).map((s) => s.word)).size} signs)</summary>
           <div className="mt-3 flex flex-wrap gap-2">
             {[...new Set(Object.values(APPROVED_SIGNS).map((s) => s.word))].map((w) => <span key={w} className="chip">{w}</span>)}
           </div>
