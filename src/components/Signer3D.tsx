@@ -99,6 +99,7 @@ export const SPELL_POSE: Pose = { ...P([-0.7, 0.3, -1.5], "point", "none", [-0.7
 export const IDLE_POSE: Pose = P(REST, "open", "none");
 
 const SKIN = "#c68a62";
+const NAIL = "#e7b9a1";
 const DENIM = "#4a4f57";
 const HAIR = "#2b1d16";
 
@@ -158,8 +159,9 @@ function Hand({ shapeRef, side }: { shapeRef: React.MutableRefObject<Shape>; sid
           <group position={[0, -0.042, 0]} ref={(g) => { if (g) middle.current[i] = g; }}>
             <mesh position={[0, -0.018, 0]} castShadow><capsuleGeometry args={[0.0075, 0.03, 5, 10]} /><meshStandardMaterial color={SKIN} roughness={0.58} /></mesh>
             <group position={[0, -0.036, 0]} ref={(g) => { if (g) tips.current[i] = g; }}>
-              <mesh position={[0, -0.013, 0]} castShadow><capsuleGeometry args={[0.0068, 0.022, 5, 10]} /><meshStandardMaterial color={SKIN} roughness={0.58} /></mesh>
-              <mesh position={[0, -0.027, 0.003]}><sphereGeometry args={[0.0068, 10, 8]} /><meshStandardMaterial color={SKIN} roughness={0.58} /></mesh>
+              <mesh position={[0, -0.013, 0]} castShadow><capsuleGeometry args={[0.0068, 0.022, 5, 10]} /><meshStandardMaterial color={SKIN} roughness={0.52} /></mesh>
+              <mesh position={[0, -0.027, 0.003]}><sphereGeometry args={[0.0068, 10, 8]} /><meshStandardMaterial color={SKIN} roughness={0.52} /></mesh>
+              <mesh position={[0, -0.026, 0.009]} rotation={[0.12, 0, 0]}><capsuleGeometry args={[0.0032, 0.008, 3, 8]} /><meshStandardMaterial color={NAIL} roughness={0.38} /></mesh>
             </group>
           </group>
         </group>
@@ -284,9 +286,10 @@ export default function Signer3D({ word, spelling, letter }: { word: string | nu
   return (
     <Canvas shadows camera={{ position: [0, 1.2, 4.6], fov: 30 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(0, 1.22, 0)}>
       <color attach="background" args={["#f1e6d6"]} />
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[1.5, 3, 2]} intensity={1.8} castShadow />
-      <directionalLight position={[-1.8, 2, 1]} intensity={0.55} color="#d9eaff" />
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[1.5, 3, 2]} intensity={2.1} castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
+      <directionalLight position={[-1.8, 2, 1]} intensity={0.65} color="#d9eaff" />
+      <pointLight position={[0, 1.8, 2.2]} intensity={0.35} distance={5} />
       <Environment>
         <Lightformer intensity={2} position={[0, 5, 0]} scale={[10, 10, 1]} />
         <Lightformer intensity={1} color="#ffd9b0" position={[-5, 1, -1]} rotation-y={Math.PI / 2} scale={[20, 1, 1]} />
