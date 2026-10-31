@@ -153,7 +153,7 @@ function Index() {
           ) : (
           <ClientOnly fallback={null}>
             <Suspense fallback={null}>
-              <Signer3D word={cur?.word ?? null} spelling={!!cur && !cur.verified} />
+              <Signer3D word={cur?.word ?? null} spelling={!!cur && !cur.verified} letter={cur?.big} />
             </Suspense>
           </ClientOnly>
           )}
