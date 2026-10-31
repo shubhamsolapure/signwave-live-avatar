@@ -50,7 +50,6 @@ export const APPROVED_SIGNS: Record<string, Sign> = {
   need: { word: "Need", emoji: "🤲", how: "Illustrative two-hand request gesture; confirm the exact ISL sign with a fluent signer.", video: "" },
   want: { word: "Want", emoji: "🫴", how: "Illustrative reaching/request motion; not a verified ISL sign.", video: "" },
   pleasehelp: { word: "Please help", emoji: "🆘", how: "Illustrative two-hand help motion; use the official dictionary to confirm the sign.", video: "" },
-  me: { word: "I / Me", emoji: "👉", how: "Point toward the chest; follow the linked dictionary clip.", video: "1f6OchgCQrE" },
   waterplease: { word: "Water please", emoji: "💧", how: "Illustrative request sequence; not a single validated ISL sign.", video: "" },
   sorryplease: { word: "Sorry", emoji: "🙏", how: "Use the official dictionary clip for the exact sign.", video: "0sE5EMDNsDo" },
   medicine: { word: "Medicine", emoji: "💊", how: "Illustrative hand movement only; check the official ISLRTC dictionary for the exact sign.", video: "" },
@@ -79,8 +78,17 @@ export const APPROVED_SIGNS: Record<string, Sign> = {
   play: { word: "Play", emoji: "🎮", how: "Illustrative two-hand movement; check the official dictionary for the exact sign.", video: "" },
   open: { word: "Open", emoji: "↔️", how: "Illustrative outward movement; check the official dictionary for the exact sign.", video: "" },
   close: { word: "Close", emoji: "🔒", how: "Illustrative inward movement; check the official dictionary for the exact sign.", video: "" },
+  // Experimental avatar-only gestures: no bundled official dictionary clip is claimed.
+  sit: { word: "Sit", emoji: "🪑", how: "Experimental avatar gesture; confirm the correct ISL sign with the ISLRTC dictionary or a fluent signer.", video: "" },
+  stand: { word: "Stand", emoji: "🧍", how: "Experimental avatar gesture; confirm the correct ISL sign with the ISLRTC dictionary or a fluent signer.", video: "" },
+  book: { word: "Book", emoji: "📘", how: "Experimental avatar gesture; confirm the correct ISL sign with the ISLRTC dictionary or a fluent signer.", video: "" },
+  teacher: { word: "Teacher", emoji: "👩‍🏫", how: "Experimental avatar gesture; confirm the correct ISL sign with the ISLRTC dictionary or a fluent signer.", video: "" },
+  student: { word: "Student", emoji: "🎓", how: "Experimental avatar gesture; confirm the correct ISL sign with the ISLRTC dictionary or a fluent signer.", video: "" },
+  money: { word: "Money", emoji: "💰", how: "Experimental avatar gesture; confirm the correct ISL sign with the ISLRTC dictionary or a fluent signer.", video: "" },
+  police: { word: "Police", emoji: "👮", how: "Experimental avatar gesture; confirm the correct ISL sign with the ISLRTC dictionary or a fluent signer.", video: "" },
+  ambulance: { word: "Ambulance", emoji: "🚑", how: "Experimental avatar gesture; confirm the correct ISL sign with the ISLRTC dictionary or a fluent signer.", video: "" },
+  pain: { word: "Pain", emoji: "🩹", how: "Experimental avatar gesture; confirm the correct ISL sign with the ISLRTC dictionary or a fluent signer.", video: "" },
   comehere: { word: "Come", emoji: "🫴", how: "Use the linked dictionary clip for the exact sign.", video: "HSEV-Y2g3A8" },
-  understand: { word: "Understand", emoji: "💡", how: "Use the linked dictionary clip for the exact sign.", video: "-rahbCV2Pp4" },
 
 };
 
