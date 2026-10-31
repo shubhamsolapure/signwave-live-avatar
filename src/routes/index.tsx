@@ -50,7 +50,7 @@ type Frame = { label: string; big: string; how: string; verified: boolean; word:
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true, word: s.sign.word, video: s.sign.video, lookupUrl: null }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true, word: s.sign.word, video: s.sign.video || null, lookupUrl: s.sign.video ? null : "https://divyangjan.depwd.gov.in/islrtc/" }]
       : s.letters.map((l, i) => ({
           label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
           big: l,
@@ -145,25 +145,25 @@ function Index() {
             ) : cur ? (
               <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
                 <span className="font-display text-8xl text-foreground">{cur.big}</span>
-                <a className="chip" href={`https://www.youtube.com/watch?v=${ISLRTC_ALPHABET_VIDEO}`} target="_blank" rel="noreferrer">Watch official ISL alphabet ↗</a>
+                <a className="chip" href="https://divyangjan.depwd.gov.in/islrtc/" target="_blank" rel="noreferrer">Open official ISLRTC dictionary ↗</a>
               </div>
             ) : (
-              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Select a message to explore a dictionary clip or fingerspelling</div>
+              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Select a message to explore a dictionary clip or an illustrative 3D gesture</div>
             )
           ) : (
           <ClientOnly fallback={null}>
             <Suspense fallback={null}>
-              <Signer3D word={cur?.word ?? null} spelling={!!cur && !cur.verified} letter={cur?.big} />
+              <Signer3D word={cur?.word ?? null} spelling={!!cur && !cur.word} letter={cur?.big} />
             </Suspense>
           </ClientOnly>
           )}
-          {mode === "avatar" && cur && !cur.verified && <span className="avatar-letter">{cur.big}</span>}
+          {mode === "avatar" && cur && !cur.word && <span className="avatar-letter">{cur.big}</span>}
         </div>
 
         <section className="stage" aria-live="polite">
           {cur ? (
             <>
-              <span className={cur.verified ? "badge-verified" : "badge-spell"}>{cur.verified ? "Dictionary video available · check clip" : "Fingerspelling"}</span>
+              <span className={cur.word ? "badge-verified" : "badge-spell"}>{cur.word ? (cur.video ? "Dictionary clip available · check clip" : "3D gesture prototype · check official ISL dictionary") : "Fingerspelling"}</span>
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
               {!(mode === "real" && cur.verified) && <p className="text-muted-foreground">{cur.how}</p>}
