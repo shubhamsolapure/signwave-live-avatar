@@ -69,7 +69,7 @@ function Index() {
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [listening, setListening] = useState(false);
-  const [mode, setMode] = useState<"real" | "avatar">("real");
+  const [mode, setMode] = useState<"real" | "avatar">("avatar");
   const [micOk, setMicOk] = useState(true);
   const [slowPlayback, setSlowPlayback] = useState(false);
   const [phraseQuery, setPhraseQuery] = useState("");
@@ -130,12 +130,12 @@ function Index() {
         <header>
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">Saanjh</p>
           <h1 className="font-display text-4xl leading-tight text-foreground">Speak or type.<br />See it in sign.</h1>
-          <p className="mt-2 text-muted-foreground">Explore ISL dictionary clips and fingerspelling. This prototype is not a validated sentence-level ISL translator; keep the original caption visible and confirm meaning with a fluent ISL signer.</p>
+          <p className="mt-2 text-muted-foreground">The animated 3D character is shown first. It performs prototype gestures for supported words; unknown words are fingerspelled visually, but this is not yet a validated sentence-level ISL translator. Keep the original caption visible and confirm meaning with a fluent ISL signer.</p>
         </header>
 
         <div className="mode-toggle" role="tablist">
           <button className={mode === "real" ? "mode-on" : "mode-off"} onClick={() => setMode("real")}>Real signer (official)</button>
-          <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>3D character</button>
+          <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>Animated 3D signer</button>
         </div>
         <div className="avatar-frame">
           {mode === "real" ? (
