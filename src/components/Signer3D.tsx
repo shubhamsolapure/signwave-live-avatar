@@ -58,7 +58,8 @@ export const POSES: Record<string, Pose> = {
   Today: { ...P(FRONT, "open", "nod", mirror(FRONT)), both: true },
   Understand: P([-0.9, 0.2, -2.4], "point", "tap"),
 };
-// Unknown words use a neutral two-hand presentation pose. This is not a substitute for the correct ISL alphabet handshape for each letter.\nexport const SPELL_POSE: Pose = { ...P([-0.7, 0.3, -1.5], "point", "none", [-0.7, 0.3, -1.5]), both: true };
+// Unknown words use a neutral two-hand presentation pose. This is not a substitute for the correct ISL alphabet handshape for each letter.
+export const SPELL_POSE: Pose = { ...P([-0.7, 0.3, -1.5], "point", "none", [-0.7, 0.3, -1.5]), both: true };
 export const IDLE_POSE: Pose = P(REST, "open", "none");
 
 const SKIN = "#c68a62";
