@@ -18,12 +18,39 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Frame = { label: string; big: string; how: string; verified: boolean; word: string | null; video: string | null };
+const OFFICIAL_ISL_LOOKUPS: Record<string, { label: string; url: string }> = {
+  "accident": { label: "Accident", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=29&search=Accident&type=list" },
+  "pain": { label: "Ache / Pain", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=40&search=Ache%2C+Pain&type=list" },
+  "able": { label: "Able / Can", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=13&search=Able%2C+Can&type=list" },
+  "afternoon": { label: "Afternoon", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=89&search=Afternoon&type=list" },
+  "airport": { label: "Airport", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=117&search=Airport&type=list" },
+  "allergy": { label: "Allergy", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=139&search=Allergy&type=list" },
+  "ambulance": { label: "Ambulance", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=165&search=Ambulance&type=list" },
+  "answer": { label: "Answer", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=184&search=Answer&type=list" },
+  "apple": { label: "Apple", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=195&search=Apple&type=list" },
+  "ask": { label: "Ask / Question", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=244&search=Ask%2C+Question&type=list" },
+  "aunt": { label: "Aunt", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=273&search=Aunt&type=list" },
+  "available": { label: "Available", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=279&search=Available&type=list" },
+  "award": { label: "Award / Prize", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=283&search=Award%2C+Prize&type=list" },
+  "man": { label: "Man", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2055&search=Man&type=list" },
+  "mango": { label: "Mango", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2058&search=Mango&type=list" },
+  "market": { label: "Market", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2067&search=Market&type=list" },
+  "medicine": { label: "Medicine", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2102&search=Medicine&type=list" },
+  "message": { label: "Message", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2116&search=Message&type=list" },
+  "metro": { label: "Metro", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2124&search=Metro&type=list" },
+  "milk": { label: "Milk", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2137&search=Milk&type=list" },
+  "morning": { label: "Morning", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2176&search=Morning&type=list" },
+  "mother": { label: "Mother", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2181&search=Mother&type=list" },
+  "my": { label: "My", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2212&search=My&type=list" },
+  "air pollution": { label: "Air pollution", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=113&search=Air+Pollution&type=list" },
+};
+
+type Frame = { label: string; big: string; how: string; verified: boolean; word: string | null; video: string | null; lookupUrl: string | null };
 
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true, word: s.sign.word, video: s.sign.video }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true, word: s.sign.word, video: s.sign.video, lookupUrl: null }]
       : s.letters.map((l, i) => ({
           label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
           big: l,
@@ -31,6 +58,7 @@ function toFrames(steps: Step[]): Frame[] {
           verified: false,
           word: null,
           video: null,
+          lookupUrl: OFFICIAL_ISL_LOOKUPS[s.source.toLowerCase()]?.url ?? null,
         })),
   );
 }
@@ -44,6 +72,7 @@ function Index() {
   const [mode, setMode] = useState<"real" | "avatar">("real");
   const [micOk, setMicOk] = useState(true);
   const [slowPlayback, setSlowPlayback] = useState(false);
+  const [phraseQuery, setPhraseQuery] = useState("");
   const recRef = useRef<any>(null);
 
   useEffect(() => {
@@ -81,7 +110,19 @@ function Index() {
   };
 
   const cur = frames[idx];
-  const quick = ["Hello, what is your name?", "I need help, call doctor", "Thank you friend"];
+  const quick = ["Hello", "Thank you", "I need help", "Where is the hospital?"];
+  const phraseGroups = [
+    { title: "Greetings & introductions", items: ["Hello", "Good morning", "Good night", "What is your name?", "My name is Rahul", "Nice to meet you", "How are you?", "I am happy", "Thank you", "You are my friend"] },
+    { title: "Needs & everyday life", items: ["I need help", "I need water", "I want food", "I want to drink water", "Please wait", "Come here", "Please come", "Go there", "Stop please", "I want to go home"] },
+    { title: "Health & safety", items: ["Call a doctor", "Where is the hospital?", "I need a doctor", "I am not feeling good", "Please help me", "I need water now", "I am hurt", "Call my family", "I need help now", "Please stop"] },
+    { title: "School & social", items: ["Where is the school?", "I love my family", "You are a good friend", "I understand", "I do not understand", "What is this?", "Where are you?", "Please tell me", "See you today", "Thank you for helping me"] },
+    { title: "Home & travel", items: ["Where is my home?", "I want to go home", "Come with me", "Go to school", "Where is the bus?", "I need to go now", "Please come here", "Wait for me", "This is my house", "Where should I go?"] },
+    { title: "Time & conversation", items: ["What time is it?", "See you tomorrow", "See you later", "I am here today", "Are you okay?", "Yes, I understand", "No, I do not understand", "Please repeat", "Can you help me?", "Thank you very much"] },
+  ];
+  const visiblePhrases = phraseGroups.map((group) => ({
+    ...group,
+    items: group.items.filter((phrase) => phrase.toLowerCase().includes(phraseQuery.toLowerCase().trim())),
+  })).filter((group) => group.items.length > 0);
 
   return (
     <main className="min-h-screen bg-background px-4 py-8">
@@ -107,7 +148,7 @@ function Index() {
                 <a className="chip" href={`https://www.youtube.com/watch?v=${ISLRTC_ALPHABET_VIDEO}`} target="_blank" rel="noreferrer">Watch official ISL alphabet ↗</a>
               </div>
             ) : (
-              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Official ISLRTC signer videos will play here</div>
+              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Select a message to explore a dictionary clip or fingerspelling</div>
             )
           ) : (
           <ClientOnly fallback={null}>
@@ -126,6 +167,11 @@ function Index() {
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
               {!(mode === "real" && cur.verified) && <p className="text-muted-foreground">{cur.how}</p>}
+              {cur.lookupUrl && (
+                <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">
+                  Open official ISLRTC entry ↗
+                </a>
+              )}
               <div className="flex w-full items-center gap-2 pt-2">
                 <button className="btn-ghost" onClick={() => { setPlaying(false); setIdx((i) => Math.max(0, i - 1)); }}>‹</button>
                 <div className="h-2 flex-1 rounded-full bg-muted"><div className="h-2 rounded-full bg-primary transition-all" style={{ width: `${((idx + 1) / frames.length) * 100}%` }} /></div>
@@ -162,8 +208,47 @@ function Index() {
           </div>
         </section>
 
+        <section className="rounded-2xl border bg-card p-4 space-y-2">
+          <h2 className="text-xl font-display text-foreground">Explore the full official ISL dictionary</h2>
+          <p className="text-sm text-muted-foreground">This project currently contains a small local set of linked dictionary clips. ISLRTC’s Government of India dictionary provides a much larger searchable collection, including everyday, academic, medical, legal, technical, and regional vocabulary.</p>
+          <a className="btn-primary inline-flex items-center justify-center gap-2" href="https://divyangjan.depwd.gov.in/islrtc/" target="_blank" rel="noreferrer">Search official ISLRTC dictionary ↗</a>
+          <p className="text-xs text-muted-foreground">The official dictionary opens separately. Its full catalogue is not automatically copied into this app, and only individually sourced clips are counted in the local dictionary.</p>
+        </section>
+
+        <section className="rounded-2xl border bg-card p-4 space-y-3">
+          <div>
+            <h2 className="text-xl font-display text-foreground">Additional official ISLRTC dictionary entries</h2>
+            <p className="text-sm text-muted-foreground">Browse 24 more official dictionary entry pages. These open on the Government of India dictionary site; they are not counted as bundled local video clips unless separately imported and checked.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(OFFICIAL_ISL_LOOKUPS).map(([key, entry]) => (
+              <a key={key} className="chip" href={entry.url} target="_blank" rel="noreferrer">{entry.label} ↗</a>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-2xl border bg-card p-4 space-y-4">
+          <div>
+            <h2 className="text-xl font-display text-foreground">Everyday phrase library</h2>
+            <p className="mt-1 text-sm text-muted-foreground">60 ready-to-practice messages across greetings, daily needs, health, and school. Select one to play it through the current dictionary/fingerspelling system.</p>
+          </div>
+          <input className="field" value={phraseQuery} onChange={(e) => setPhraseQuery(e.target.value)} placeholder="Search phrases…" aria-label="Search phrase library" />
+          {visiblePhrases.map((group) => (
+            <div key={group.title} className="space-y-2">
+              <h3 className="font-semibold text-foreground">{group.title}</h3>
+              <div className="flex flex-wrap gap-2">
+                {group.items.map((phrase) => (
+                  <button key={phrase} className="chip" onClick={() => { setText(phrase); go(phrase); }}>{phrase}</button>
+                ))}
+              </div>
+            </div>
+          ))}
+          {visiblePhrases.length === 0 && <p className="text-sm text-muted-foreground">No matching phrases. Try “help”, “water”, or “school”.</p>}
+          <p className="text-xs text-muted-foreground">These are practice messages, not verified sentence translations. Words without an individual dictionary entry are spelled out; ISL grammar and full-sentence signs require expert review.</p>
+        </section>
+
         <details className="rounded-2xl border bg-card p-4">
-          <summary className="cursor-pointer font-semibold text-foreground">Dictionary clips listed ({new Set(Object.values(APPROVED_SIGNS).map((s) => s.word)).size} signs)</summary>
+          <summary className="cursor-pointer font-semibold text-foreground">Local dictionary clips ({new Set(Object.values(APPROVED_SIGNS).map((s) => s.word)).size} signs)</summary>
           <div className="mt-3 flex flex-wrap gap-2">
             {[...new Set(Object.values(APPROVED_SIGNS).map((s) => s.word))].map((w) => <span key={w} className="chip">{w}</span>)}
           </div>

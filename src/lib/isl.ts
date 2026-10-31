@@ -47,6 +47,17 @@ export const APPROVED_SIGNS: Record<string, Sign> = {
   understand: { word: "Understand", emoji: "💡", how: "Index finger near temple flicks up.", video: "-rahbCV2Pp4" },
 };
 
+// English aliases reuse an existing dictionary clip; they are not additional
+// independently validated ISL signs.
+const SIGN_ALIASES: Record<string, Sign> = {
+  hey: APPROVED_SIGNS.hi,
+  hiya: APPROVED_SIGNS.hi,
+  thx: APPROVED_SIGNS.thanks,
+  pls: APPROVED_SIGNS.please,
+  yep: APPROVED_SIGNS.yes,
+  nope: APPROVED_SIGNS.no,
+};
+
 export const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split("");
 
 export type Step =
@@ -64,7 +75,7 @@ export function translate(text: string): Step[] {
       i++;
       continue;
     }
-    const sign = APPROVED_SIGNS[w];
+    const sign = APPROVED_SIGNS[w] ?? SIGN_ALIASES[w];
     if (sign) steps.push({ kind: "sign", source: w, sign });
     else steps.push({ kind: "spell", source: w, letters: w.toUpperCase().split("") });
   }
