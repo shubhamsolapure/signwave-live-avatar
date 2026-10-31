@@ -226,7 +226,7 @@ function Body({ pose }: { pose: Pose }) {
 export default function Signer3D({ word, spelling }: { word: string | null; spelling: boolean }) {
   const pose = spelling ? SPELL_POSE : (word && POSES[word]) || IDLE_POSE;
   return (
-    <Canvas shadows camera={{ position: [0, 1.2, 3.15], fov: 31 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(0, 1.22, 0)}>
+    <Canvas shadows camera={{ position: [0, 1.2, 4.6], fov: 30 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(0, 1.22, 0)}>
       <color attach="background" args={["#f1e6d6"]} />
       <ambientLight intensity={0.7} />
       <directionalLight position={[1.5, 3, 2]} intensity={1.8} castShadow />\n      <directionalLight position={[-1.8, 2, 1]} intensity={0.55} color="#d9eaff" />
