@@ -45,3 +45,12 @@ This project is a prototype, **not a certified or validated automatic ISL interp
 5. Keep the original text visible and disclose uncertainty until validation is complete.
 
 Do not rely on this prototype as the sole channel for emergency, medical, legal, or other high-stakes communication.
+
+
+## Avatar and phrase-library improvements
+
+The enhanced procedural avatar now has segmented finger joints and two-joint thumbs, smoother pose changes, improved framing and lighting, and a lower rendering pixel-ratio ceiling for mobile performance. This is still a stylized procedural character; it is not a motion-captured or anatomically validated ISL avatar, and the current spelling pose does not yet encode each letter's exact handshape.
+
+The interface includes a searchable library of 60 everyday practice messages covering greetings, daily needs, health and safety, school/social conversation, home/travel, and time. Six common English aliases reuse existing dictionary clips. Phrase playback remains word-by-word with fingerspelling for unsupported words; it is not sentence-level ISL translation.
+
+**Accuracy boundary:** Do not present the procedural avatar's approximate gestures or word-by-word phrase playback as validated ISL. The next major step is to source and license additional ISLRTC dictionary/phrase clips, then have Deaf ISL reviewers verify each sign and sentence-level translation. Preserve the original text caption while testing.
