@@ -13,8 +13,13 @@ describe("translate", () => {
   it("treats thank you as one sign", () => {
     expect(translate("thank you").length).toBe(1);
   });
-  it("fingerspells words with no official ISLRTC clip", () => {
+  it("fingerspells words with no dictionary entry", () => {
     expect(translate("you")[0]?.kind).toBe("spell");
+  });
+  it("resolves common English aliases to existing dictionary clips", () => {
+    expect(translate("hey")[0]).toMatchObject({ kind: "sign", sign: { word: "Hi" } });
+    expect(translate("pls")[0]).toMatchObject({ kind: "sign", sign: { word: "Please" } });
+    expect(translate("nope")[0]).toMatchObject({ kind: "sign", sign: { word: "No" } });
   });
   it("every approved sign has an official video", () => {
     expect(translate("hello water doctor").every((x) => x.kind === "sign" && x.sign.video.length === 11)).toBe(true);
