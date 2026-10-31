@@ -50,7 +50,7 @@ type Frame = { label: string; big: string; how: string; verified: boolean; word:
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true, word: s.sign.word, video: s.sign.video || null, lookupUrl: s.sign.video ? null : "https://divyangjan.depwd.gov.in/islrtc/" }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), word: s.sign.word, video: s.sign.video || null, lookupUrl: s.sign.video ? null : "https://divyangjan.depwd.gov.in/islrtc/" }]
       : s.letters.map((l, i) => ({
           label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
           big: l,
@@ -71,6 +71,7 @@ function Index() {
   const [listening, setListening] = useState(false);
   const [mode, setMode] = useState<"real" | "avatar">("avatar");
   const [micOk, setMicOk] = useState(true);
+  const [voiceError, setVoiceError] = useState("");
   const [slowPlayback, setSlowPlayback] = useState(false);
   const [phraseQuery, setPhraseQuery] = useState("");
   const recRef = useRef<any>(null);
@@ -81,8 +82,20 @@ function Index() {
     const r = new SR();
     r.lang = "en-IN";
     r.interimResults = true;
-    r.onresult = (e: any) => setText(Array.from(e.results).map((x: any) => x[0].transcript).join(" "));
-    r.onend = () => setListening(false);
+    r.continuous = false;
+    r.onresult = (e: any) => {
+      const transcript = Array.from(e.results as ArrayLike<any>).map((x: any) => x[0]?.transcript ?? "").join(" ").trim();
+      setText(transcript);
+    };
+    r.onerror = (e: any) => {
+      setVoiceError(e?.error === "not-allowed" ? "Microphone access was blocked. Allow microphone access in your browser settings." : `Voice input error: ${e?.error ?? "please try again"}.`);
+      setListening(false);
+    };
+    r.onend = () => {
+      setListening(false);
+      const finalText = (document.querySelector("textarea") as HTMLTextAreaElement | null)?.value?.trim();
+      if (finalText) go(finalText);
+    };
     recRef.current = r;
   }, []);
 
@@ -94,6 +107,7 @@ function Index() {
   }, [playing, idx, frames, mode, slowPlayback]);
 
   const go = (t = text) => {
+    setVoiceError("");
     const f = toFrames(translate(t));
     setFrames(f);
     setIdx(0);
@@ -103,10 +117,13 @@ function Index() {
   const mic = () => {
     if (!recRef.current) return;
     if (listening) { recRef.current.stop(); return; }
-    setText("");
-    recRef.current.onend = () => { setListening(false); setText((t) => { go(t); return t; }); };
-    recRef.current.start();
-    setListening(true);
+    setVoiceError("");
+    try {
+      recRef.current.start();
+      setListening(true);
+    } catch {
+      setVoiceError("Voice input could not start. Stop any active recording and try again.");
+    }
   };
 
   const cur = frames[idx];
@@ -163,7 +180,7 @@ function Index() {
         <section className="stage" aria-live="polite">
           {cur ? (
             <>
-              <span className={cur.word ? "badge-verified" : "badge-spell"}>{cur.word ? (cur.video ? "Dictionary clip available · check clip" : "3D gesture prototype · check official ISL dictionary") : "Fingerspelling"}</span>
+              <span className={cur.video ? "badge-verified" : "badge-spell"}>{cur.video ? "Official ISLRTC dictionary clip linked · confirm sign in clip" : cur.word ? "Experimental 3D gesture · NOT verified ISL" : "Fingerspelling prototype · handshape not validated"}</span>
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
               {!(mode === "real" && cur.verified) && <p className="text-muted-foreground">{cur.how}</p>}
@@ -198,11 +215,13 @@ function Index() {
 
         <section className="space-y-3">
           <textarea className="field" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="Type a message…" />
+          {voiceError && <p role="alert" className="text-sm text-destructive">{voiceError}</p>}
           <div className="flex gap-3">
-            <button className="btn-primary flex-1" onClick={() => go()} disabled={!text.trim()}>Show in sign</button>
+            <button className="btn-primary flex-1" onClick={() => go()} disabled={!text.trim()}>Translate text to sign</button>
             <button className={listening ? "btn-mic btn-mic-on" : "btn-mic"} onClick={mic} disabled={!micOk} aria-label="Speak">{listening ? "■" : "🎤"}</button>
           </div>
-          {!micOk && <p className="text-sm text-muted-foreground">Voice input isn't supported in this browser — try Chrome, or type instead.</p>}
+          {!micOk && <p className="text-sm text-muted-foreground">Voice input is not supported in this browser. Try Chrome or type your message instead.</p>}
+          {micOk && <p className="text-xs text-muted-foreground">Voice recognition uses your browser speech service (English–India). Microphone permission and an internet connection may be required.</p>}
           <div className="flex flex-wrap gap-2">
             {quick.map((q) => <button key={q} className="chip" onClick={() => { setText(q); go(q); }}>{q}</button>)}
           </div>
