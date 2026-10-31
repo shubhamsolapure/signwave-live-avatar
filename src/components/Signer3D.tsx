@@ -84,6 +84,15 @@ export const POSES: Record<string, Pose> = {
   Play: { ...P(FRONT, "open", "circle", mirror(FRONT)), both: true },
   Open: { ...P(FRONT, "open", "forward", mirror(FRONT)), both: true },
   Close: { ...P(FRONT, "fist", "circle", mirror(FRONT)), both: true },
+  Sit: P([-0.4, 0.45, -1.8], "open", "tap"),
+  Stand: P(FRONT, "open", "forward"),
+  Book: { ...P(FRONT, "open", "circle", mirror(FRONT)), both: true },
+  Teacher: { ...P(FRONT, "bunch", "tap", mirror(FRONT)), both: true },
+  Student: { ...P(CHEST, "bunch", "tap", mirror(CHEST)), both: true },
+  Money: { ...P(FRONT, "bunch", "tap", mirror(FRONT)), both: true },
+  Police: P(FOREHEAD, "open", "tap"),
+  Ambulance: { ...P(FRONT, "open", "forward", mirror(FRONT)), both: true },
+  Pain: P(CHEST, "point", "tap"),
 };
 // Unknown words use a neutral two-hand presentation pose. This is not a substitute for the correct ISL alphabet handshape for each letter.
 export const SPELL_POSE: Pose = { ...P([-0.7, 0.3, -1.5], "point", "none", [-0.7, 0.3, -1.5]), both: true };
