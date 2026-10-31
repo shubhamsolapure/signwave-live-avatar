@@ -147,7 +147,7 @@ function Index() {
         <header>
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">Saanjh</p>
           <h1 className="font-display text-4xl leading-tight text-foreground">Speak or type.<br />See it in sign.</h1>
-          <p className="mt-2 text-muted-foreground">The animated 3D character is shown first. It performs prototype gestures for supported words; unknown words are fingerspelled visually, but this is not yet a validated sentence-level ISL translator. Keep the original caption visible and confirm meaning with a fluent ISL signer.</p>
+          <p className="mt-2 text-muted-foreground">The full-body 3D avatar has a procedural two-hand rig with individually articulated fingers. Its movements are illustrative prototypes, not motion-captured or expert-validated ISL. Official dictionary clips are linked where available; sentence grammar and fingerspelling still need expert review.</p>
         </header>
 
         <div className="mode-toggle" role="tablist">
@@ -180,7 +180,7 @@ function Index() {
         <section className="stage" aria-live="polite">
           {cur ? (
             <>
-              <span className={cur.video ? "badge-verified" : "badge-spell"}>{cur.video ? "Official ISLRTC dictionary clip linked · confirm sign in clip" : cur.word ? "Experimental 3D gesture · NOT verified ISL" : "Fingerspelling prototype · handshape not validated"}</span>
+              <span className={mode === "real" && cur.video ? "badge-verified" : "badge-spell"}>{mode === "real" && cur.video ? "Official ISLRTC dictionary reference video" : cur.word && cur.video ? "Experimental avatar gesture · official reference linked" : cur.word ? "Experimental 3D gesture · NOT verified ISL" : "Fingerspelling prototype · handshape not validated"}</span>
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
               {!(mode === "real" && cur.verified) && <p className="text-muted-foreground">{cur.how}</p>}
