@@ -223,13 +223,33 @@ function Body({ pose }: { pose: Pose }) {
   );
 }
 
-export default function Signer3D({ word, spelling }: { word: string | null; spelling: boolean }) {
-  const pose = spelling ? SPELL_POSE : (word && POSES[word]) || IDLE_POSE;
+const SPELLING_SHAPES: Record<string, Shape> = {
+  A: "fist", B: "open", C: "bunch", D: "point", E: "fist", F: "bunch",
+  G: "point", H: "point", I: "point", J: "point", K: "point", L: "point",
+  M: "fist", N: "fist", O: "bunch", P: "point", Q: "point", R: "point",
+  S: "fist", T: "fist", U: "point", V: "point", W: "open", X: "point",
+  Y: "open", Z: "point",
+};
+function spellingPose(letter: string | undefined): Pose {
+  const shape = SPELLING_SHAPES[(letter ?? "").toUpperCase()] ?? "open";
+  const offset = ((letter?.toUpperCase().charCodeAt(0) ?? 65) - 65) % 5;
+  return {
+    r: [-0.55 - offset * 0.12, 0.2 + offset * 0.08, -1.1 - offset * 0.12],
+    l: [-0.55 - offset * 0.12, -0.2 - offset * 0.08, -1.1 - offset * 0.12],
+    shape,
+    move: offset % 2 === 0 ? "tap" : "none",
+    both: true,
+  };
+}
+
+export default function Signer3D({ word, spelling, letter }: { word: string | null; spelling: boolean; letter?: string }) {
+  const pose = spelling ? spellingPose(letter) : (word && POSES[word]) || IDLE_POSE;
   return (
     <Canvas shadows camera={{ position: [0, 1.2, 4.6], fov: 30 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(0, 1.22, 0)}>
       <color attach="background" args={["#f1e6d6"]} />
       <ambientLight intensity={0.7} />
-      <directionalLight position={[1.5, 3, 2]} intensity={1.8} castShadow />\n      <directionalLight position={[-1.8, 2, 1]} intensity={0.55} color="#d9eaff" />
+      <directionalLight position={[1.5, 3, 2]} intensity={1.8} castShadow />
+      <directionalLight position={[-1.8, 2, 1]} intensity={0.55} color="#d9eaff" />
       <Environment>
         <Lightformer intensity={2} position={[0, 5, 0]} scale={[10, 10, 1]} />
         <Lightformer intensity={1} color="#ffd9b0" position={[-5, 1, -1]} rotation-y={Math.PI / 2} scale={[20, 1, 1]} />
