@@ -56,8 +56,10 @@ const FILLER = new Set(["a", "an", "the", "is", "am", "are", "to", "of"]);
 export function translate(text: string): Step[] {
   const words = text.toLowerCase().replace(/[^a-z0-9\s']/g, " ").replace(/'/g, "").split(/\s+/).filter(Boolean);
   const steps: Step[] = [];
-  for (const w of words) {
-    if (FILLER.has(w)) continue; // ISL grammar drops these
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i]!;
+    if (FILLER.has(w)) continue;
+    if (w === "thank" && words[i + 1] === "you") i++; // "thank you" is one sign // ISL grammar drops these
     const sign = APPROVED_SIGNS[w];
     if (sign) steps.push({ kind: "sign", source: w, sign });
     else steps.push({ kind: "spell", source: w, letters: w.toUpperCase().split("") });

@@ -141,8 +141,8 @@ function Body({ pose }: { pose: Pose }) {
         <mesh position={[0, -0.045, 0.1]} rotation={[0, 0, Math.PI / 2]}><capsuleGeometry args={[0.006, 0.03, 4, 8]} /><meshStandardMaterial color="#8a4a3a" /></mesh>
       </group>
       <mesh position={[0, 1.5, 0]}><cylinderGeometry args={[0.045, 0.05, 0.08]} /><meshStandardMaterial color={SKIN} /></mesh>
-      <mesh position={[0, 1.22, 0]} castShadow><capsuleGeometry args={[0.17, 0.3, 8, 16]} /><meshStandardMaterial color={SHIRT} roughness={0.8} /></mesh>
-      <mesh position={[0, 0.88, 0]} castShadow><cylinderGeometry args={[0.16, 0.15, 0.2]} /><meshStandardMaterial color={DENIM} roughness={0.9} /></mesh>
+      <mesh position={[0, 1.22, 0]} castShadow><capsuleGeometry args={[0.135, 0.3, 8, 16]} /><meshStandardMaterial color={SHIRT} roughness={0.8} /></mesh>
+      <mesh position={[0, 0.88, 0]} castShadow><cylinderGeometry args={[0.13, 0.13, 0.2]} /><meshStandardMaterial color={DENIM} roughness={0.9} /></mesh>
       <ArmRig side={1} poseRef={poseRef} />
       <ArmRig side={-1} poseRef={poseRef} />
     </group>

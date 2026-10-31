@@ -10,6 +10,9 @@ describe("translate", () => {
     const s = translate("Shubham");
     expect(s).toEqual([{ kind: "spell", source: "shubham", letters: ["S", "H", "U", "B", "H", "A", "M"] }]);
   });
+  it("treats thank you as one sign", () => {
+    expect(translate("thank you").length).toBe(1);
+  });
   it("drops filler words", () => {
     expect(translate("what is your name").map((x) => x.source)).toEqual(["what", "your", "name"]);
   });
