@@ -18,12 +18,39 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Frame = { label: string; big: string; how: string; verified: boolean; word: string | null; video: string | null };
+const OFFICIAL_ISL_LOOKUPS: Record<string, { label: string; url: string }> = {
+  "accident": { label: "Accident", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=29&search=Accident&type=list" },
+  "pain": { label: "Ache / Pain", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=40&search=Ache%2C+Pain&type=list" },
+  "able": { label: "Able / Can", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=13&search=Able%2C+Can&type=list" },
+  "afternoon": { label: "Afternoon", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=89&search=Afternoon&type=list" },
+  "airport": { label: "Airport", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=117&search=Airport&type=list" },
+  "allergy": { label: "Allergy", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=139&search=Allergy&type=list" },
+  "ambulance": { label: "Ambulance", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=165&search=Ambulance&type=list" },
+  "answer": { label: "Answer", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=184&search=Answer&type=list" },
+  "apple": { label: "Apple", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=195&search=Apple&type=list" },
+  "ask": { label: "Ask / Question", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=244&search=Ask%2C+Question&type=list" },
+  "aunt": { label: "Aunt", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=273&search=Aunt&type=list" },
+  "available": { label: "Available", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=279&search=Available&type=list" },
+  "award": { label: "Award / Prize", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=283&search=Award%2C+Prize&type=list" },
+  "man": { label: "Man", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2055&search=Man&type=list" },
+  "mango": { label: "Mango", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2058&search=Mango&type=list" },
+  "market": { label: "Market", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2067&search=Market&type=list" },
+  "medicine": { label: "Medicine", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2102&search=Medicine&type=list" },
+  "message": { label: "Message", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2116&search=Message&type=list" },
+  "metro": { label: "Metro", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2124&search=Metro&type=list" },
+  "milk": { label: "Milk", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2137&search=Milk&type=list" },
+  "morning": { label: "Morning", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2176&search=Morning&type=list" },
+  "mother": { label: "Mother", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2181&search=Mother&type=list" },
+  "my": { label: "My", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=2212&search=My&type=list" },
+  "air pollution": { label: "Air pollution", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=113&search=Air+Pollution&type=list" },
+};
+
+type Frame = { label: string; big: string; how: string; verified: boolean; word: string | null; video: string | null; lookupUrl: string | null };
 
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true, word: s.sign.word, video: s.sign.video }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true, word: s.sign.word, video: s.sign.video, lookupUrl: null }]
       : s.letters.map((l, i) => ({
           label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
           big: l,
@@ -31,6 +58,7 @@ function toFrames(steps: Step[]): Frame[] {
           verified: false,
           word: null,
           video: null,
+          lookupUrl: OFFICIAL_ISL_LOOKUPS[s.source.toLowerCase()]?.url ?? null,
         })),
   );
 }
@@ -139,6 +167,11 @@ function Index() {
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
               {!(mode === "real" && cur.verified) && <p className="text-muted-foreground">{cur.how}</p>}
+              {cur.lookupUrl && (
+                <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">
+                  Open official ISLRTC entry ↗
+                </a>
+              )}
               <div className="flex w-full items-center gap-2 pt-2">
                 <button className="btn-ghost" onClick={() => { setPlaying(false); setIdx((i) => Math.max(0, i - 1)); }}>‹</button>
                 <div className="h-2 flex-1 rounded-full bg-muted"><div className="h-2 rounded-full bg-primary transition-all" style={{ width: `${((idx + 1) / frames.length) * 100}%` }} /></div>
@@ -180,6 +213,18 @@ function Index() {
           <p className="text-sm text-muted-foreground">This project currently contains a small local set of linked dictionary clips. ISLRTC’s Government of India dictionary provides a much larger searchable collection, including everyday, academic, medical, legal, technical, and regional vocabulary.</p>
           <a className="btn-primary inline-flex items-center justify-center gap-2" href="https://divyangjan.depwd.gov.in/islrtc/" target="_blank" rel="noreferrer">Search official ISLRTC dictionary ↗</a>
           <p className="text-xs text-muted-foreground">The official dictionary opens separately. Its full catalogue is not automatically copied into this app, and only individually sourced clips are counted in the local dictionary.</p>
+        </section>
+
+        <section className="rounded-2xl border bg-card p-4 space-y-3">
+          <div>
+            <h2 className="text-xl font-display text-foreground">Additional official ISLRTC dictionary entries</h2>
+            <p className="text-sm text-muted-foreground">Browse 24 more official dictionary entry pages. These open on the Government of India dictionary site; they are not counted as bundled local video clips unless separately imported and checked.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(OFFICIAL_ISL_LOOKUPS).map(([key, entry]) => (
+              <a key={key} className="chip" href={entry.url} target="_blank" rel="noreferrer">{entry.label} ↗</a>
+            ))}
+          </div>
         </section>
 
         <section className="rounded-2xl border bg-card p-4 space-y-4">
