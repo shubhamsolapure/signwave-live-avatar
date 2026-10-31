@@ -44,6 +44,7 @@ function Index() {
   const [mode, setMode] = useState<"real" | "avatar">("real");
   const [micOk, setMicOk] = useState(true);
   const [slowPlayback, setSlowPlayback] = useState(false);
+  const [phraseQuery, setPhraseQuery] = useState("");
   const recRef = useRef<any>(null);
 
   useEffect(() => {
@@ -81,7 +82,17 @@ function Index() {
   };
 
   const cur = frames[idx];
-  const quick = ["Hello, what is your name?", "I need help, call doctor", "Thank you friend"];
+  const quick = ["Hello", "Thank you", "I need help", "Where is the hospital?"];
+  const phraseGroups = [
+    { title: "Greetings & introductions", items: ["Hello", "Good morning", "Good night", "What is your name?", "My name is Rahul", "Nice to meet you", "How are you?", "I am happy", "Thank you", "You are my friend"] },
+    { title: "Needs & everyday life", items: ["I need help", "I need water", "I want food", "I want to drink water", "Please wait", "Come here", "Please come", "Go there", "Stop please", "I want to go home"] },
+    { title: "Health & safety", items: ["Call a doctor", "Where is the hospital?", "I need a doctor", "I am not feeling good", "Please help me", "I need water now", "I am hurt", "Call my family", "I need help now", "Please stop"] },
+    { title: "School & social", items: ["Where is the school?", "I love my family", "You are a good friend", "I understand", "I do not understand", "What is this?", "Where are you?", "Please tell me", "See you today", "Thank you for helping me"] },
+  ];
+  const visiblePhrases = phraseGroups.map((group) => ({
+    ...group,
+    items: group.items.filter((phrase) => phrase.toLowerCase().includes(phraseQuery.toLowerCase().trim())),
+  })).filter((group) => group.items.length > 0);
 
   return (
     <main className="min-h-screen bg-background px-4 py-8">
@@ -107,7 +118,7 @@ function Index() {
                 <a className="chip" href={`https://www.youtube.com/watch?v=${ISLRTC_ALPHABET_VIDEO}`} target="_blank" rel="noreferrer">Watch official ISL alphabet ↗</a>
               </div>
             ) : (
-              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Official ISLRTC signer videos will play here</div>
+              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Select a message to explore a dictionary clip or fingerspelling</div>
             )
           ) : (
           <ClientOnly fallback={null}>
@@ -160,6 +171,26 @@ function Index() {
           <div className="flex flex-wrap gap-2">
             {quick.map((q) => <button key={q} className="chip" onClick={() => { setText(q); go(q); }}>{q}</button>)}
           </div>
+        </section>
+
+        <section className="rounded-2xl border bg-card p-4 space-y-4">
+          <div>
+            <h2 className="text-xl font-display text-foreground">Everyday phrase library</h2>
+            <p className="mt-1 text-sm text-muted-foreground">40 ready-to-practice messages across greetings, daily needs, health, and school. Select one to play it through the current dictionary/fingerspelling system.</p>
+          </div>
+          <input className="field" value={phraseQuery} onChange={(e) => setPhraseQuery(e.target.value)} placeholder="Search phrases…" aria-label="Search phrase library" />
+          {visiblePhrases.map((group) => (
+            <div key={group.title} className="space-y-2">
+              <h3 className="font-semibold text-foreground">{group.title}</h3>
+              <div className="flex flex-wrap gap-2">
+                {group.items.map((phrase) => (
+                  <button key={phrase} className="chip" onClick={() => { setText(phrase); go(phrase); }}>{phrase}</button>
+                ))}
+              </div>
+            </div>
+          ))}
+          {visiblePhrases.length === 0 && <p className="text-sm text-muted-foreground">No matching phrases. Try “help”, “water”, or “school”.</p>}
+          <p className="text-xs text-muted-foreground">These are practice messages, not verified sentence translations. Words without an individual dictionary entry are spelled out; ISL grammar and full-sentence signs require expert review.</p>
         </section>
 
         <details className="rounded-2xl border bg-card p-4">
