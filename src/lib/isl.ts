@@ -54,7 +54,7 @@ export type Step =
   | { kind: "spell"; source: string; letters: string[] };
 
 export function translate(text: string): Step[] {
-  const words = text.toLowerCase().replace(/[^a-z0-9\\s']/g, " ").replace(/'/g, "").split(/\\s+/).filter(Boolean);
+  const words = text.toLowerCase().replace(/[^a-z0-9\s']/g, " ").replace(/'/g, "").split(/\s+/).filter(Boolean);
   const steps: Step[] = [];
   for (let i = 0; i < words.length; i++) {
     const w = words[i]!;
