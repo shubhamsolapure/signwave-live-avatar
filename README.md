@@ -54,3 +54,10 @@ The enhanced procedural avatar now has segmented finger joints and two-joint thu
 The interface includes a searchable library of 60 everyday practice messages covering greetings, daily needs, health and safety, school/social conversation, home/travel, and time. Six common English aliases reuse existing dictionary clips. Phrase playback remains word-by-word with fingerspelling for unsupported words; it is not sentence-level ISL translation.
 
 **Accuracy boundary:** Do not present the procedural avatar's approximate gestures or word-by-word phrase playback as validated ISL. The next major step is to source and license additional ISLRTC dictionary/phrase clips, then have Deaf ISL reviewers verify each sign and sentence-level translation. Preserve the original text caption while testing.
+
+
+## Additional official dictionary references
+
+The app now links 24 individually identified entries on the Government of India's ISLRTC dictionary site, including accident, pain, airport, allergy, ambulance, medicine, milk, morning, mother, market, and metro. Unsupported words that match this lookup list show a direct official-entry link alongside the fingerspelling fallback.
+
+These are **external official dictionary references**, not 24 new videos bundled into this repository. The local verified-video count remains based only on entries in `APPROVED_SIGNS`. Do not increase that count or label a video as verified until its exact official clip, meaning, and usage have been checked. The official dictionary provides a far larger catalogue, but its entries should be integrated only through a supported, appropriately acknowledged and licensed source.
