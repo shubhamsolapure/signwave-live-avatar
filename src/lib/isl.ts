@@ -53,15 +53,17 @@ export type Step =
   | { kind: "sign"; source: string; sign: Sign }
   | { kind: "spell"; source: string; letters: string[] };
 
-const FILLER = new Set(["a", "an", "the", "is", "am", "are", "to", "of"]);
-
 export function translate(text: string): Step[] {
   const words = text.toLowerCase().replace(/[^a-z0-9\s']/g, " ").replace(/'/g, "").split(/\s+/).filter(Boolean);
   const steps: Step[] = [];
   for (let i = 0; i < words.length; i++) {
     const w = words[i]!;
-    if (FILLER.has(w)) continue;
-    if (w === "thank" && words[i + 1] === "you") i++; // "thank you" is one sign // ISL grammar drops these
+    // Preserve every word until a Deaf-reviewed sentence-level grammar layer exists.
+    if (w === "thank" && words[i + 1] === "you") {
+      steps.push({ kind: "sign", source: "thank you", sign: APPROVED_SIGNS.thank });
+      i++;
+      continue;
+    }
     const sign = APPROVED_SIGNS[w];
     if (sign) steps.push({ kind: "sign", source: w, sign });
     else steps.push({ kind: "spell", source: w, letters: w.toUpperCase().split("") });

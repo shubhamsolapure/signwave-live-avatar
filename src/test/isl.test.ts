@@ -19,7 +19,10 @@ describe("translate", () => {
   it("every approved sign has an official video", () => {
     expect(translate("hello water doctor").every((x) => x.kind === "sign" && x.sign.video.length === 11)).toBe(true);
   });
-  it("drops filler words", () => {
-    expect(translate("what is your name").map((x) => x.source)).toEqual(["what", "your", "name"]);
+  it("does not silently drop grammatical words", () => {
+    expect(translate("I am not happy").map((x) => x.source)).toEqual(["i", "am", "not", "happy"]);
+  });
+  it("preserves question and subject words", () => {
+    expect(translate("what is your name").map((x) => x.source)).toEqual(["what", "is", "your", "name"]);
   });
 });
