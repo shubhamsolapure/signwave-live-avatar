@@ -88,6 +88,8 @@ function Index() {
     { title: "Needs & everyday life", items: ["I need help", "I need water", "I want food", "I want to drink water", "Please wait", "Come here", "Please come", "Go there", "Stop please", "I want to go home"] },
     { title: "Health & safety", items: ["Call a doctor", "Where is the hospital?", "I need a doctor", "I am not feeling good", "Please help me", "I need water now", "I am hurt", "Call my family", "I need help now", "Please stop"] },
     { title: "School & social", items: ["Where is the school?", "I love my family", "You are a good friend", "I understand", "I do not understand", "What is this?", "Where are you?", "Please tell me", "See you today", "Thank you for helping me"] },
+    { title: "Home & travel", items: ["Where is my home?", "I want to go home", "Come with me", "Go to school", "Where is the bus?", "I need to go now", "Please come here", "Wait for me", "This is my house", "Where should I go?"] },
+    { title: "Time & conversation", items: ["What time is it?", "See you tomorrow", "See you later", "I am here today", "Are you okay?", "Yes, I understand", "No, I do not understand", "Please repeat", "Can you help me?", "Thank you very much"] },
   ];
   const visiblePhrases = phraseGroups.map((group) => ({
     ...group,
@@ -176,7 +178,7 @@ function Index() {
         <section className="rounded-2xl border bg-card p-4 space-y-4">
           <div>
             <h2 className="text-xl font-display text-foreground">Everyday phrase library</h2>
-            <p className="mt-1 text-sm text-muted-foreground">40 ready-to-practice messages across greetings, daily needs, health, and school. Select one to play it through the current dictionary/fingerspelling system.</p>
+            <p className="mt-1 text-sm text-muted-foreground">60 ready-to-practice messages across greetings, daily needs, health, and school. Select one to play it through the current dictionary/fingerspelling system.</p>
           </div>
           <input className="field" value={phraseQuery} onChange={(e) => setPhraseQuery(e.target.value)} placeholder="Search phrases…" aria-label="Search phrase library" />
           {visiblePhrases.map((group) => (
