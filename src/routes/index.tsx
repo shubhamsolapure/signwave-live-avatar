@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { ClientOnly } from "@tanstack/react-router";
+const Signer3D = lazy(() => import("@/components/Signer3D"));
 import { translate, APPROVED_SIGNS, type Step } from "@/lib/isl";
 
 export const Route = createFileRoute("/")({
@@ -16,17 +18,18 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Frame = { label: string; big: string; how: string; verified: boolean };
+type Frame = { label: string; big: string; how: string; verified: boolean; word: string | null };
 
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true, word: s.sign.word }]
       : s.letters.map((l, i) => ({
           label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
           big: l,
           how: `Fingerspell the letter ${l} with ISL two-hand alphabet.`,
           verified: false,
+          word: null,
         })),
   );
 }
@@ -86,11 +89,20 @@ function Index() {
           <p className="mt-2 text-muted-foreground">Indian Sign Language from verified signs only. Unknown words are fingerspelled — never guessed.</p>
         </header>
 
+        <div className="avatar-frame">
+          <ClientOnly fallback={null}>
+            <Suspense fallback={null}>
+              <Signer3D word={cur?.word ?? null} spelling={!!cur && !cur.verified} />
+            </Suspense>
+          </ClientOnly>
+          {cur && !cur.verified && <span className="avatar-letter">{cur.big}</span>}
+        </div>
+
         <section className="stage" aria-live="polite">
           {cur ? (
             <>
               <span className={cur.verified ? "badge-verified" : "badge-spell"}>{cur.verified ? "✓ Verified sign" : "Fingerspelling"}</span>
-              <div className="key-in text-8xl font-display" key={idx}>{cur.big}</div>
+              <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
               <p className="text-muted-foreground">{cur.how}</p>
               <div className="flex w-full items-center gap-2 pt-2">

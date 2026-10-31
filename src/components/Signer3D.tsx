@@ -149,9 +149,10 @@ function Body({ pose }: { pose: Pose }) {
   );
 }
 
-export default function Signer3D({ pose }: { pose: Pose }) {
+export default function Signer3D({ word, spelling }: { word: string | null; spelling: boolean }) {
+  const pose = spelling ? SPELL_POSE : (word && POSES[word]) || IDLE_POSE;
   return (
-    <Canvas shadows camera={{ position: [0, 1.35, 1.6], fov: 32 }} dpr={[1, 2]} onCreated={({ gl }) => gl.domElement.parentElement?.parentElement?.setAttribute("data-scene-ready", "1")}>
+    <Canvas shadows camera={{ position: [0, 1.35, 1.6], fov: 32 }} dpr={[1, 2]} onCreated={({ camera }) => camera.lookAt(0, 1.32, 0)}>
       <color attach="background" args={["#f1e6d6"]} />
       <ambientLight intensity={0.5} />
       <directionalLight position={[1.5, 3, 2]} intensity={1.6} castShadow />
