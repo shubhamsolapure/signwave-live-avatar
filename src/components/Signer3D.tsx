@@ -155,7 +155,7 @@ function Body({ pose }: { pose: Pose }) {
     <group>
       <group ref={head} position={[0, 1.62, 0]}>
         <mesh castShadow scale={[0.92, 1.08, 0.98]}><sphereGeometry args={[0.11, 48, 48]} /><meshStandardMaterial color={SKIN} roughness={0.5} /></mesh>
-        <mesh position={[0, -0.075, 0.02]} scale={[0.75, 0.5, 0.8]}><sphereGeometry args={[0.1, 32, 32]} /><meshStandardMaterial color={SKIN} roughness={0.5} /></mesh>
+        <mesh position={[0, -0.06, 0]} scale={[0.8, 0.5, 0.85]}><sphereGeometry args={[0.1, 32, 32]} /><meshStandardMaterial color={SKIN} roughness={0.5} /></mesh>
         {/* swept-up hair */}
         <mesh position={[0, 0.06, -0.01]} scale={[1.0, 0.75, 1.05]}><sphereGeometry args={[0.112, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} /><meshStandardMaterial color={HAIR} roughness={0.85} /></mesh>
         <mesh position={[0.01, 0.1, 0.05]} rotation={[0.4, 0, -0.2]} scale={[1.3, 0.55, 0.8]}><sphereGeometry args={[0.06, 24, 24]} /><meshStandardMaterial color={HAIR} roughness={0.85} /></mesh>
