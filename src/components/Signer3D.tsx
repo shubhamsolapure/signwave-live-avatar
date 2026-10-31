@@ -62,9 +62,27 @@ export const SPELL_POSE: Pose = { ...P([-0.7, 0.3, -1.5], "point", "none", [-0.7
 export const IDLE_POSE: Pose = P(REST, "open", "none");
 
 const SKIN = "#c68a62";
-const SHIRT = "#2f7a68";
 const DENIM = "#4a4f57";
 const HAIR = "#2b1d16";
+
+let plaidTex: THREE.CanvasTexture | null = null;
+function plaid() {
+  if (plaidTex) return plaidTex;
+  const c = document.createElement("canvas");
+  c.width = c.height = 256;
+  const g = c.getContext("2d")!;
+  g.fillStyle = "#e9e4da"; g.fillRect(0, 0, 256, 256);
+  const bands: [number, number, string][] = [[0, 70, "#2f7a68"], [90, 18, "#c0394b"], [130, 50, "#2f7a68"], [200, 10, "#3b5fa8"], [225, 14, "#e2b33c"]];
+  g.globalAlpha = 0.55;
+  for (const [o, w, col] of bands) { g.fillStyle = col; g.fillRect(o, 0, w, 256); g.fillRect(0, o, 256, w); }
+  g.globalAlpha = 1;
+  plaidTex = new THREE.CanvasTexture(c);
+  plaidTex.wrapS = plaidTex.wrapT = THREE.RepeatWrapping;
+  plaidTex.repeat.set(3, 3);
+  plaidTex.colorSpace = THREE.SRGBColorSpace;
+  return plaidTex;
+}
+function Shirt() { return <meshStandardMaterial map={plaid()} roughness={0.85} />; }
 
 function Hand({ shapeRef, side }: { shapeRef: React.MutableRefObject<Shape>; side: 1 | -1 }) {
   const fingers = useRef<THREE.Group[]>([]);
@@ -116,8 +134,9 @@ function ArmRig({ side, poseRef }: { side: 1 | -1; poseRef: React.MutableRefObje
   });
   return (
     <group ref={shoulder} position={[-0.21 * side, 1.42, 0]}>
-      <mesh position={[0, -0.14, 0]} castShadow><capsuleGeometry args={[0.045, 0.2, 6, 12]} /><meshStandardMaterial color={SHIRT} roughness={0.8} /></mesh>
+      <mesh position={[0, -0.14, 0]} castShadow><capsuleGeometry args={[0.045, 0.2, 6, 12]} /><Shirt /></mesh>
       <group ref={elbow} position={[0, -0.29, 0]}>
+        <mesh position={[0, -0.03, 0]} castShadow><cylinderGeometry args={[0.048, 0.044, 0.07, 16]} /><Shirt /></mesh>
         <mesh position={[0, -0.12, 0]} castShadow><capsuleGeometry args={[0.035, 0.19, 6, 12]} /><meshStandardMaterial color={SKIN} roughness={0.6} /></mesh>
         <group position={[0, -0.26, 0]}><Hand shapeRef={shapeRef} side={side} /></group>
       </group>
@@ -135,14 +154,38 @@ function Body({ pose }: { pose: Pose }) {
   return (
     <group>
       <group ref={head} position={[0, 1.62, 0]}>
-        <mesh castShadow><sphereGeometry args={[0.11, 32, 32]} /><meshStandardMaterial color={SKIN} roughness={0.55} /></mesh>
-        <mesh position={[0, 0.05, -0.01]} scale={[1.05, 0.7, 1.05]}><sphereGeometry args={[0.112, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} /><meshStandardMaterial color={HAIR} roughness={0.9} /></mesh>
-        {[-0.038, 0.038].map((x) => <mesh key={x} position={[x, 0.01, 0.1]}><sphereGeometry args={[0.012, 12, 12]} /><meshStandardMaterial color="#1a1a1a" /></mesh>)}
-        <mesh position={[0, -0.045, 0.1]} rotation={[0, 0, Math.PI / 2]}><capsuleGeometry args={[0.006, 0.03, 4, 8]} /><meshStandardMaterial color="#8a4a3a" /></mesh>
+        <mesh castShadow scale={[0.92, 1.08, 0.98]}><sphereGeometry args={[0.11, 48, 48]} /><meshStandardMaterial color={SKIN} roughness={0.5} /></mesh>
+        <mesh position={[0, -0.075, 0.02]} scale={[0.75, 0.5, 0.8]}><sphereGeometry args={[0.1, 32, 32]} /><meshStandardMaterial color={SKIN} roughness={0.5} /></mesh>
+        {/* swept-up hair */}
+        <mesh position={[0, 0.06, -0.01]} scale={[1.0, 0.75, 1.05]}><sphereGeometry args={[0.112, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} /><meshStandardMaterial color={HAIR} roughness={0.85} /></mesh>
+        <mesh position={[0.01, 0.1, 0.05]} rotation={[0.4, 0, -0.2]} scale={[1.3, 0.55, 0.8]}><sphereGeometry args={[0.06, 24, 24]} /><meshStandardMaterial color={HAIR} roughness={0.85} /></mesh>
+        {[-1, 1].map((x) => (
+          <group key={x}>
+            <mesh position={[x * 0.1, -0.005, 0]} scale={[0.4, 1, 0.7]}><sphereGeometry args={[0.03, 16, 16]} /><meshStandardMaterial color={SKIN} /></mesh>
+            <mesh position={[x * 0.036, 0.008, 0.096]}><sphereGeometry args={[0.014, 16, 16]} /><meshStandardMaterial color="#f4efe8" /></mesh>
+            <mesh position={[x * 0.036, 0.008, 0.108]}><sphereGeometry args={[0.007, 12, 12]} /><meshStandardMaterial color="#2a1c14" /></mesh>
+            <mesh position={[x * 0.037, 0.035, 0.1]} rotation={[0, 0, x * -0.12]}><boxGeometry args={[0.032, 0.007, 0.01]} /><meshStandardMaterial color={HAIR} /></mesh>
+          </group>
+        ))}
+        <mesh position={[0, -0.02, 0.11]} rotation={[0.3, 0, 0]}><coneGeometry args={[0.014, 0.04, 12]} /><meshStandardMaterial color={SKIN} /></mesh>
+        <mesh position={[0, -0.065, 0.098]} rotation={[0, 0, Math.PI / 2]}><capsuleGeometry args={[0.006, 0.028, 4, 8]} /><meshStandardMaterial color="#9a5a48" /></mesh>
       </group>
       <mesh position={[0, 1.5, 0]}><cylinderGeometry args={[0.045, 0.05, 0.08]} /><meshStandardMaterial color={SKIN} /></mesh>
-      <mesh position={[0, 1.22, 0]} castShadow><capsuleGeometry args={[0.135, 0.3, 8, 16]} /><meshStandardMaterial color={SHIRT} roughness={0.8} /></mesh>
-      <mesh position={[0, 0.88, 0]} castShadow><cylinderGeometry args={[0.13, 0.13, 0.2]} /><meshStandardMaterial color={DENIM} roughness={0.9} /></mesh>
+      {/* collar */}
+      {[-1, 1].map((x) => <mesh key={x} position={[x * 0.035, 1.475, 0.045]} rotation={[0.5, 0, x * 0.6]}><boxGeometry args={[0.06, 0.04, 0.008]} /><Shirt /></mesh>)}
+      {/* torso: shoulders to waist */}
+      <mesh position={[0, 1.24, 0]} scale={[1, 1, 0.62]} castShadow><capsuleGeometry args={[0.16, 0.26, 8, 24]} /><Shirt /></mesh>
+      {[-1, 1].map((x) => <mesh key={x} position={[x * 0.075, 1.3, 0.1]}><boxGeometry args={[0.07, 0.06, 0.012]} /><Shirt /></mesh>)}
+      {[1.42, 1.34, 1.26, 1.18, 1.1].map((y) => <mesh key={y} position={[0, y, 0.1 + (y > 1.3 ? 0 : 0.003)]}><sphereGeometry args={[0.007, 8, 8]} /><meshStandardMaterial color="#ddd" metalness={0.6} /></mesh>)}
+      <mesh position={[0, 0.98, 0]} scale={[1, 1, 0.65]}><cylinderGeometry args={[0.155, 0.15, 0.04, 24]} /><meshStandardMaterial color="#1f1a17" /></mesh>
+      {/* jeans */}
+      <mesh position={[0, 0.9, 0]} scale={[1, 1, 0.65]} castShadow><cylinderGeometry args={[0.15, 0.15, 0.14, 24]} /><meshStandardMaterial color={DENIM} roughness={0.9} /></mesh>
+      {[-1, 1].map((x) => (
+        <group key={x}>
+          <mesh position={[x * 0.075, 0.45, 0]} rotation={[0, 0, x * 0.04]} castShadow><capsuleGeometry args={[0.065, 0.75, 8, 16]} /><meshStandardMaterial color={DENIM} roughness={0.9} /></mesh>
+          <mesh position={[x * 0.09, 0.03, 0.05]} scale={[1, 0.6, 1.9]} castShadow><sphereGeometry args={[0.06, 20, 20]} /><meshStandardMaterial color="#2b2622" roughness={0.7} /></mesh>
+        </group>
+      ))}
       <ArmRig side={1} poseRef={poseRef} />
       <ArmRig side={-1} poseRef={poseRef} />
     </group>
@@ -152,7 +195,7 @@ function Body({ pose }: { pose: Pose }) {
 export default function Signer3D({ word, spelling }: { word: string | null; spelling: boolean }) {
   const pose = spelling ? SPELL_POSE : (word && POSES[word]) || IDLE_POSE;
   return (
-    <Canvas shadows camera={{ position: [0, 1.35, 1.6], fov: 32 }} dpr={[1, 2]} onCreated={({ camera }) => camera.lookAt(0, 1.32, 0)}>
+    <Canvas shadows camera={{ position: [0, 1.25, 1.9], fov: 34 }} dpr={[1, 2]} onCreated={({ camera }) => camera.lookAt(0, 1.22, 0)}>
       <color attach="background" args={["#f1e6d6"]} />
       <ambientLight intensity={0.5} />
       <directionalLight position={[1.5, 3, 2]} intensity={1.6} castShadow />
@@ -161,7 +204,7 @@ export default function Signer3D({ word, spelling }: { word: string | null; spel
         <Lightformer intensity={1} color="#ffd9b0" position={[-5, 1, -1]} rotation-y={Math.PI / 2} scale={[20, 1, 1]} />
       </Environment>
       <group position={[0, -0.05, 0]}><Body pose={pose} /></group>
-      <ContactShadows position={[0, 0.75, 0]} opacity={0.3} blur={2} />
+      <ContactShadows position={[0, -0.05, 0]} opacity={0.3} blur={2} />
     </Canvas>
   );
 }
