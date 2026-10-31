@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 const Signer3D = lazy(() => import("@/components/Signer3D"));
-import { translate, APPROVED_SIGNS, type Step } from "@/lib/isl";
+import { translate, APPROVED_SIGNS, ISLRTC_ALPHABET_VIDEO, type Step } from "@/lib/isl";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -18,18 +18,19 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Frame = { label: string; big: string; how: string; verified: boolean; word: string | null };
+type Frame = { label: string; big: string; how: string; verified: boolean; word: string | null; video: string | null };
 
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true, word: s.sign.word }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: true, word: s.sign.word, video: s.sign.video }]
       : s.letters.map((l, i) => ({
           label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
           big: l,
           how: `Fingerspell the letter ${l} with ISL two-hand alphabet.`,
           verified: false,
           word: null,
+          video: null,
         })),
   );
 }
@@ -40,6 +41,7 @@ function Index() {
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [listening, setListening] = useState(false);
+  const [mode, setMode] = useState<"real" | "avatar">("real");
   const [micOk, setMicOk] = useState(true);
   const recRef = useRef<any>(null);
 
@@ -57,9 +59,9 @@ function Index() {
   useEffect(() => {
     if (!playing) return;
     if (idx >= frames.length - 1) return setPlaying(false);
-    const t = setTimeout(() => setIdx((i) => i + 1), frames[idx]?.verified ? 2200 : 1100);
+    const t = setTimeout(() => setIdx((i) => i + 1), frames[idx]?.verified ? (mode === "real" ? 5000 : 2200) : 1100);
     return () => clearTimeout(t);
-  }, [playing, idx, frames]);
+  }, [playing, idx, frames, mode]);
 
   const go = (t = text) => {
     const f = toFrames(translate(t));
@@ -86,22 +88,40 @@ function Index() {
         <header>
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">Saanjh</p>
           <h1 className="font-display text-4xl leading-tight text-foreground">Speak or type.<br />See it in sign.</h1>
-          <p className="mt-2 text-muted-foreground">Indian Sign Language from verified signs only. Unknown words are fingerspelled — never guessed.</p>
+          <p className="mt-2 text-muted-foreground">Indian Sign Language shown by real signers from the official ISLRTC dictionary. Unknown words are fingerspelled — never guessed.</p>
         </header>
 
+        <div className="mode-toggle" role="tablist">
+          <button className={mode === "real" ? "mode-on" : "mode-off"} onClick={() => setMode("real")}>Real signer (official)</button>
+          <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>3D character</button>
+        </div>
         <div className="avatar-frame">
+          {mode === "real" ? (
+            cur?.video ? (
+              <iframe key={cur.video} className="h-full w-full" title={`ISL sign: ${cur.label}`} allow="autoplay; encrypted-media" allowFullScreen
+                src={`https://www.youtube-nocookie.com/embed/${cur.video}?autoplay=1&mute=1&loop=1&playlist=${cur.video}&controls=0&rel=0&modestbranding=1&playsinline=1`} />
+            ) : cur ? (
+              <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+                <span className="font-display text-8xl text-foreground">{cur.big}</span>
+                <a className="chip" href={`https://www.youtube.com/watch?v=${ISLRTC_ALPHABET_VIDEO}`} target="_blank" rel="noreferrer">Watch official ISL alphabet ↗</a>
+              </div>
+            ) : (
+              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Official ISLRTC signer videos will play here</div>
+            )
+          ) : (
           <ClientOnly fallback={null}>
             <Suspense fallback={null}>
               <Signer3D word={cur?.word ?? null} spelling={!!cur && !cur.verified} />
             </Suspense>
           </ClientOnly>
-          {cur && !cur.verified && <span className="avatar-letter">{cur.big}</span>}
+          )}
+          {mode === "avatar" && cur && !cur.verified && <span className="avatar-letter">{cur.big}</span>}
         </div>
 
         <section className="stage" aria-live="polite">
           {cur ? (
             <>
-              <span className={cur.verified ? "badge-verified" : "badge-spell"}>{cur.verified ? "✓ Verified sign" : "Fingerspelling"}</span>
+              <span className={cur.verified ? "badge-verified" : "badge-spell"}>{cur.verified ? "✓ Official ISLRTC sign" : "Fingerspelling"}</span>
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
               <p className="text-muted-foreground">{cur.how}</p>

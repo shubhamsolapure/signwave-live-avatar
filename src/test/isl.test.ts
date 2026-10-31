@@ -13,6 +13,12 @@ describe("translate", () => {
   it("treats thank you as one sign", () => {
     expect(translate("thank you").length).toBe(1);
   });
+  it("fingerspells words with no official ISLRTC clip", () => {
+    expect(translate("you")[0]?.kind).toBe("spell");
+  });
+  it("every approved sign has an official video", () => {
+    expect(translate("hello water doctor").every((x) => x.kind === "sign" && x.sign.video.length === 11)).toBe(true);
+  });
   it("drops filler words", () => {
     expect(translate("what is your name").map((x) => x.source)).toEqual(["what", "your", "name"]);
   });

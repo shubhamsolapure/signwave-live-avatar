@@ -3,7 +3,7 @@ export type Sign = { word: string; emoji: string; how: string; video: string };
 
 export const ISLRTC_ALPHABET_VIDEO = "VdwKSyza5oI";
 
-// Approved sign dictionary — only these are shown as whole-word signs.
+// Approved = has an official ISLRTC dictionary video (youtube.com/@islrtc).
 // Any other word is fingerspelled letter by letter (never guessed).
 export const APPROVED_SIGNS: Record<string, Sign> = {
   hello: { word: "Hello", emoji: "👋", how: "Open palm near forehead, move it outward like a salute.", video: "yBQA3coUjH0" },
