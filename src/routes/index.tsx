@@ -70,7 +70,7 @@ function Index() {
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [listening, setListening] = useState(false);
-  const [mode, setMode] = useState<"hybrid" | "avatar">("hybrid");
+  const [mode, setMode] = useState<"hybrid" | "avatar">("avatar");
   const [micOk, setMicOk] = useState(true);
   const [voiceError, setVoiceError] = useState("");
   const [slowPlayback, setSlowPlayback] = useState(false);
@@ -154,8 +154,8 @@ function Index() {
   const badgeText = (() => {
     if (mode === "hybrid" && cur?.validatedAnimation) return "✅ ISL animation reviewed and validated";
     if (mode === "hybrid" && cur?.video) return "📹 Official reference video · 3D sign not yet validated";
-    if (mode === "avatar" && cur?.word && cur?.video) return "⚠️ Experimental 3D gesture · NOT validated ISL";
-    if (mode === "avatar" && cur?.word) return "⚠️ Experimental 3D gesture · NOT verified ISL";
+    if (mode === "avatar" && cur?.word && cur?.video) return "⚠️ Experimental 3D pose/fingerspelling · NOT validated ISL";
+    if (mode === "avatar" && cur?.word) return "⚠️ Experimental 3D pose/fingerspelling · NOT verified ISL";
     return "🔤 Fingerspelling · handshape not validated";
   })();
 
