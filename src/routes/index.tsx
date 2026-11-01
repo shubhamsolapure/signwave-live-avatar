@@ -151,9 +151,9 @@ function Index() {
 
   // Clear badge text based on status
   const badgeText = (() => {
-    if (mode === "real" && cur?.video) return "✅ Official ISLRTC dictionary video";
-    if (cur?.word && cur?.video) return "✅ Verified sign · official video linked";
-    if (cur?.word) return "⚠️ Experimental 3D gesture · NOT verified ISL";
+    if (mode === "real" && cur?.video) return "✅ Official ISLRTC reference video";
+    if (mode === "avatar" && cur?.word && cur?.video) return "⚠️ Experimental 3D approximation · compare with official video";
+    if (mode === "avatar" && cur?.word) return "⚠️ Experimental 3D gesture · NOT verified ISL";
     return "🔤 Fingerspelling · handshape not validated";
   })();
 
@@ -211,6 +211,20 @@ function Index() {
               <span className={cur.verified || (mode === "real" && cur.video) ? "badge-verified" : "badge-spell"}>{badgeText}</span>
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
+              {mode === "avatar" && cur.video && (
+                <button
+                  className="btn-primary mt-2"
+                  onClick={() => setMode("real")}
+                  aria-label={`Watch official ISLRTC reference for ${cur.label}`}
+                >
+                  Watch official ISL reference for “{cur.label}” ↗
+                </button>
+              )}
+              {mode === "avatar" && cur.word && (
+                <p className="text-xs text-muted-foreground">
+                  The 3D movement is a prototype and may not match the real ISL sign. Use the official reference video to confirm the handshape, orientation, location and movement.
+                </p>
+              )}
               {!(mode === "real" && cur.verified) && <p className="text-muted-foreground">{cur.how}</p>}
               {cur.lookupUrl && (
                 <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">
