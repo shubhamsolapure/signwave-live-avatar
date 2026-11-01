@@ -1,5 +1,5 @@
 /** video = YouTube id of the official ISLRTC dictionary clip (youtube.com/@islrtc) */
-export type Sign = { word: string; emoji: string; how: string; video: string };
+export type Sign = { word: string; emoji: string; how: string; video: string; /** Set true only after an ISL-fluent reviewer validates the matching 3D animation. */ validatedAnimation?: boolean };
 
 export const ISLRTC_ALPHABET_VIDEO = "VdwKSyza5oI";
 
