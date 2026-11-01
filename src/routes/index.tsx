@@ -76,6 +76,7 @@ function Index() {
   const [phraseQuery, setPhraseQuery] = useState("");
   const [officialQuery, setOfficialQuery] = useState("");
   const recRef = useRef<any>(null);
+  const transcriptRef = useRef("");
 
   useEffect(() => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -85,7 +86,9 @@ function Index() {
     r.interimResults = true;
     r.continuous = false;
     r.onresult = (e: any) => {
-      const transcript = Array.from(e.results as ArrayLike<any>).map((x: any) => x[0]?.transcript ?? "").join(" ").trim();
+      const results = Array.from(e.results as ArrayLike<any>);
+      const transcript = results.map((x: any) => x[0]?.transcript ?? "").join(" ").replace(/\\s+/g, " ").trim();
+      transcriptRef.current = transcript;
       setText(transcript);
     };
     r.onerror = (e: any) => {
@@ -94,8 +97,11 @@ function Index() {
     };
     r.onend = () => {
       setListening(false);
-      const finalText = (document.querySelector("textarea") as HTMLTextAreaElement | null)?.value?.trim();
+      // Prefer the recognizer's transcript over querying the first textarea in the DOM.
+      const finalText = transcriptRef.current.trim() ||
+        (document.querySelector("textarea") as HTMLTextAreaElement | null)?.value?.trim() || "";
       if (finalText) go(finalText);
+      else setVoiceError("No speech was detected. Try again or type your message.");
     };
     recRef.current = r;
   }, []);
@@ -119,6 +125,7 @@ function Index() {
     if (!recRef.current) return;
     if (listening) { recRef.current.stop(); return; }
     setVoiceError("");
+    transcriptRef.current = "";
     try {
       recRef.current.start();
       setListening(true);
