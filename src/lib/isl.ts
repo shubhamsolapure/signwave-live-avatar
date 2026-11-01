@@ -130,34 +130,13 @@ const SIGN_ALIASES: Record<string, Sign> = {
 };
 
 // Multi-word phrases that should be treated as a single unit when possible.
-const PHRASES: [string[], Sign][] = [
-  [["thank", "you"], APPROVED_SIGNS.thank],
-  [["thanks", "a", "lot"], APPROVED_SIGNS.thank],
-  [["good", "morning"], APPROVED_SIGNS.morning],
-  [["good", "night"], APPROVED_SIGNS.night],
-  [["i", "need", "help"], APPROVED_SIGNS.help],
-  [["need", "help"], APPROVED_SIGNS.help],
-  [["please", "help"], APPROVED_SIGNS.help],
-  [["i", "am", "happy"], APPROVED_SIGNS.happy],
-  [["i", "am", "fine"], APPROVED_SIGNS.fine],
-  [["how", "are", "you"], APPROVED_SIGNS.how],
-  [["what", "is", "your", "name"], APPROVED_SIGNS.name],
-  [["my", "name", "is"], APPROVED_SIGNS.name],
-  [["nice", "to", "meet", "you"], APPROVED_SIGNS.friend],
-  [["see", "you"], APPROVED_SIGNS.see],
-  [["see", "you", "later"], APPROVED_SIGNS.later],
-  [["see", "you", "tomorrow"], APPROVED_SIGNS.tomorrow],
-  [["i", "love", "you"], APPROVED_SIGNS.love],
-  [["i", "dont", "understand"], APPROVED_SIGNS.understand],
-  [["i", "do", "not", "understand"], APPROVED_SIGNS.understand],
-  [["where", "is", "the", "hospital"], APPROVED_SIGNS.hospital],
-  [["where", "is", "hospital"], APPROVED_SIGNS.hospital],
-  [["call", "a", "doctor"], APPROVED_SIGNS.doctor],
-  [["i", "need", "a", "doctor"], APPROVED_SIGNS.doctor],
-  [["i", "need", "water"], APPROVED_SIGNS.water],
-  [["i", "want", "food"], APPROVED_SIGNS.food],
-  [["i", "want", "to", "go", "home"], APPROVED_SIGNS.home],
-];
+/**
+ * Phrase playback is intentionally word-by-word: a sentence-level shortcut
+ * used to collapse a whole phrase into one clip, hiding other mapped word clips.
+ * The player now queues each known dictionary clip in order and fingerspells
+ * only words without a mapped sign. This does not claim that English word order
+ * is a complete grammatical ISL translation.
+ */
 
 export const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split("");
 
@@ -193,34 +172,17 @@ export function translate(text: string): Step[] {
 
   const words = cleaned.split(" ").filter(Boolean);
   const steps: Step[] = [];
-  let i = 0;
 
-  while (i < words.length) {
-    // Try to match the longest phrase first
-    let matched = false;
-    for (const [phraseWords, sign] of PHRASES) {
-      if (i + phraseWords.length <= words.length) {
-        const slice = words.slice(i, i + phraseWords.length);
-        if (slice.every((w, idx) => w === phraseWords[idx])) {
-          steps.push({ kind: "sign", source: phraseWords.join(" "), sign });
-          i += phraseWords.length;
-          matched = true;
-          break;
-        }
-      }
-    }
-    if (matched) continue;
-
-    // Single word
-    const w = words[i]!;
+  // Queue one clip per mapped word so phrase-library selections can show
+  // multiple available reference videos instead of collapsing to one sign.
+  for (const w of words) {
     const sign = APPROVED_SIGNS[w] ?? SIGN_ALIASES[w];
     if (sign) {
       steps.push({ kind: "sign", source: w, sign });
     } else {
-      // Fingerspell any unknown word – never invent a sign
+      // Unknown/function words are fingerspelled; never invent a video ID.
       steps.push({ kind: "spell", source: w, letters: w.toUpperCase().split("") });
     }
-    i++;
   }
 
   return steps;
