@@ -45,17 +45,18 @@ const OFFICIAL_ISL_LOOKUPS: Record<string, { label: string; url: string }> = {
   "air pollution": { label: "Air pollution", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=113&search=Air+Pollution&type=list" },
 };
 
-type Frame = { label: string; big: string; how: string; verified: boolean; word: string | null; video: string | null; lookupUrl: string | null };
+type Frame = { label: string; big: string; how: string; verified: boolean; validatedAnimation: boolean; word: string | null; video: string | null; lookupUrl: string | null };
 
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), word: s.sign.word, video: s.sign.video || null, lookupUrl: s.sign.video ? null : "https://divyangjan.depwd.gov.in/islrtc/" }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: s.sign.video || null, lookupUrl: s.sign.video ? null : "https://divyangjan.depwd.gov.in/islrtc/" }]
       : s.letters.map((l, i) => ({
           label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
           big: l,
           how: `Fingerspell the letter ${l} with ISL two-hand alphabet.`,
           verified: false,
+          validatedAnimation: false,
           word: null,
           video: null,
           lookupUrl: `https://www.youtube.com/@islrtcnewdelhi4069/search?query=${encodeURIComponent(s.source)}`,
@@ -69,7 +70,7 @@ function Index() {
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [listening, setListening] = useState(false);
-  const [mode, setMode] = useState<"real" | "avatar">("avatar");
+  const [mode, setMode] = useState<"hybrid" | "avatar">("hybrid");
   const [micOk, setMicOk] = useState(true);
   const [voiceError, setVoiceError] = useState("");
   const [slowPlayback, setSlowPlayback] = useState(false);
@@ -109,7 +110,7 @@ function Index() {
   useEffect(() => {
     if (!playing) return;
     if (idx >= frames.length - 1) return setPlaying(false);
-    const t = setTimeout(() => setIdx((i) => i + 1), (frames[idx]?.verified ? (mode === "real" ? 5000 : 2200) : 1100) * (slowPlayback ? 1.8 : 1));
+    const t = setTimeout(() => setIdx((i) => i + 1), (frames[idx]?.verified ? (mode === "hybrid" && !frames[idx]?.validatedAnimation ? 5000 : 2200) : 1100) * (slowPlayback ? 1.8 : 1));
     return () => clearTimeout(t);
   }, [playing, idx, frames, mode, slowPlayback]);
 
@@ -151,8 +152,9 @@ function Index() {
 
   // Clear badge text based on status
   const badgeText = (() => {
-    if (mode === "real" && cur?.video) return "✅ Official ISLRTC reference video";
-    if (mode === "avatar" && cur?.word && cur?.video) return "⚠️ Experimental 3D approximation · compare with official video";
+    if (mode === "hybrid" && cur?.validatedAnimation) return "✅ ISL animation reviewed and validated";
+    if (mode === "hybrid" && cur?.video) return "📹 Official reference video · 3D sign not yet validated";
+    if (mode === "avatar" && cur?.word && cur?.video) return "⚠️ Experimental 3D gesture · NOT validated ISL";
     if (mode === "avatar" && cur?.word) return "⚠️ Experimental 3D gesture · NOT verified ISL";
     return "🔤 Fingerspelling · handshape not validated";
   })();
@@ -167,11 +169,11 @@ function Index() {
         </header>
 
         <div className="mode-toggle" role="tablist">
-          <button className={mode === "real" ? "mode-on" : "mode-off"} onClick={() => setMode("real")}>Real signer (official)</button>
-          <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>Animated 3D signer</button>
+          <button className={mode === "hybrid" ? "mode-on" : "mode-off"} onClick={() => setMode("hybrid")}>Hybrid · verified-first</button>
+          <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>Experimental 3D avatar</button>
         </div>
         <div className="avatar-frame">
-          {mode === "real" ? (
+          {mode === "hybrid" && !cur?.validatedAnimation ? (
             cur?.video ? (
               <div className="relative h-full w-full">
                 <iframe key={cur.video} className="h-full w-full" title={`ISL sign: ${cur.label}`} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
@@ -208,7 +210,7 @@ function Index() {
         <section className="stage" aria-live="polite">
           {cur ? (
             <>
-              <span className={cur.verified || (mode === "real" && cur.video) ? "badge-verified" : "badge-spell"}>{badgeText}</span>
+              <span className={(mode === "hybrid" && cur.validatedAnimation) || (mode === "hybrid" && cur.video) ? "badge-verified" : "badge-spell"}>{badgeText}</span>
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
               {mode === "avatar" && cur.video && (
@@ -222,10 +224,10 @@ function Index() {
               )}
               {mode === "avatar" && cur.word && (
                 <p className="text-xs text-muted-foreground">
-                  The 3D movement is a prototype and may not match the real ISL sign. Use the official reference video to confirm the handshape, orientation, location and movement.
+                  The 3D movement is experimental and is not a validated ISL translation. Use the official reference video to confirm the handshape, orientation, location and movement.
                 </p>
               )}
-              {!(mode === "real" && cur.verified) && <p className="text-muted-foreground">{cur.how}</p>}
+              {(mode === "avatar" || !cur.video) && <p className="text-muted-foreground">{cur.how}</p>}
               {cur.lookupUrl && (
                 <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">
                   Find this word in official ISLRTC dictionary ↗
