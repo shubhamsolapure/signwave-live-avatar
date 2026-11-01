@@ -78,6 +78,7 @@ function Index() {
   const [officialQuery, setOfficialQuery] = useState("");
   const recRef = useRef<any>(null);
   const transcriptRef = useRef("");
+  const recognitionErrorRef = useRef(false);
 
   useEffect(() => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -93,6 +94,7 @@ function Index() {
       setText(transcript);
     };
     r.onerror = (e: any) => {
+      recognitionErrorRef.current = true;
       setVoiceError(e?.error === "not-allowed" ? "Microphone access was blocked. Allow microphone access in your browser settings." : `Voice input error: ${e?.error ?? "please try again"}.`);
       setListening(false);
     };
@@ -101,7 +103,7 @@ function Index() {
       // Prefer the recognizer's transcript over querying the first textarea in the DOM.
       const finalText = transcriptRef.current.trim();
       if (finalText) go(finalText);
-      else setVoiceError("No speech was detected. Try again or type your message.");
+      else if (!recognitionErrorRef.current) setVoiceError("No speech was detected. Try again or type your message.");
     };
     recRef.current = r;
   }, []);
@@ -126,6 +128,7 @@ function Index() {
     if (listening) { recRef.current.stop(); return; }
     setVoiceError("");
     transcriptRef.current = "";
+    recognitionErrorRef.current = false;
     try {
       recRef.current.start();
       setListening(true);
