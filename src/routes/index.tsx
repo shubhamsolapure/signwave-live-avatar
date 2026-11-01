@@ -50,7 +50,7 @@ type Frame = { label: string; big: string; how: string; verified: boolean; valid
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: s.sign.video || null, lookupUrl: s.sign.video ? null : "https://divyangjan.depwd.gov.in/islrtc/" }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: s.sign.video || null, lookupUrl: s.sign.video ? null : (OFFICIAL_ISL_LOOKUPS[(s.sign.word || "").toLowerCase()]?.url || "https://divyangjan.depwd.gov.in/islrtc/") }]
       : s.letters.map((l, i) => ({
           label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
           big: l,
@@ -184,7 +184,7 @@ function Index() {
               <div className="flex h-full flex-col items-center justify-center gap-3 p-4 text-center">
                 <span className="font-display text-6xl text-foreground">{cur.big}</span>
                 <p className="font-semibold text-foreground">Look up “{cur.word ?? cur.label}” in the official dictionary</p>
-                <p className="max-w-md text-sm text-muted-foreground">This word does not have a locally verified dictionary video. Search the full ISLRTC collection for its official video and any alternate meanings.</p>
+                <p className="max-w-md text-sm text-muted-foreground">This word does not have a locally mapped clip in SignWave yet. Open the official ISLRTC dictionary entry when available, or search the official collection. Check the meaning and any regional or alternate sign before using it.</p>
                 <form className="flex w-full max-w-md gap-2" onSubmit={(e) => { e.preventDefault(); const term = (officialQuery.trim() || cur.word || cur.label).replace(/^Spell ["“]|["”] ·.*$/g, "").trim(); if (term) window.open(`https://www.youtube.com/@islrtcnewdelhi4069/search?query=${encodeURIComponent(term)}`, "_blank", "noopener,noreferrer"); }}>
                   <input className="field min-w-0 flex-1" value={officialQuery || cur.word || cur.label} onChange={(e) => setOfficialQuery(e.target.value)} aria-label="Search official ISLRTC sign videos" placeholder="Search a word or phrase…" />
                   <button className="btn-primary" type="submit">Find videos ↗</button>
@@ -230,7 +230,7 @@ function Index() {
               {(mode === "avatar" || !cur.video) && <p className="text-muted-foreground">{cur.how}</p>}
               {cur.lookupUrl && (
                 <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">
-                  Find this word in official ISLRTC dictionary ↗
+                  {OFFICIAL_ISL_LOOKUPS[(cur.word || "").toLowerCase()] ? "Open official ISLRTC sign entry and video ↗" : "Find this word in official ISLRTC dictionary ↗"}
                 </a>
               )}
               <div className="flex w-full items-center gap-2 pt-2">
