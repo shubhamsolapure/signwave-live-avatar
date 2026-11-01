@@ -111,70 +111,94 @@ function Hand({ shapeRef, side }: { shapeRef: React.MutableRefObject<Shape>; sid
   const thumbBase = useRef<THREE.Group>(null);
   const thumbTip = useRef<THREE.Group>(null);
 
+  const fingerData = [
+    { x: -0.028, length: 0.057, radius: 0.0074 },
+    { x: -0.010, length: 0.068, radius: 0.0078 },
+    { x: 0.008, length: 0.064, radius: 0.0075 },
+    { x: 0.026, length: 0.052, radius: 0.0068 },
+  ];
+
   useFrame(() => {
     const shape = shapeRef.current;
     const curlFor = (i: number) =>
       shape === "fist" ? 1 :
       shape === "point" ? (i === 0 ? 0 : 1) :
-      shape === "bunch" ? (i === 0 ? 0.3 : 0.65) : 0;
+      shape === "bunch" ? (i === 0 ? 0.32 : 0.7) : 0;
     for (let i = 0; i < 4; i++) {
       const curl = curlFor(i);
-      const fan = (i - 1.5) * (shape === "open" ? 0.11 : 0.025);
+      const fan = shape === "open" ? (i - 1.5) * 0.13 : (i - 1.5) * 0.025;
       if (bases.current[i]) {
-        bases.current[i]!.rotation.x = THREE.MathUtils.lerp(bases.current[i]!.rotation.x, -curl * 0.9, 0.2);
-        bases.current[i]!.rotation.z = THREE.MathUtils.lerp(bases.current[i]!.rotation.z, fan, 0.2);
+        bases.current[i]!.rotation.x = THREE.MathUtils.lerp(bases.current[i]!.rotation.x, -curl * 0.78, 0.18);
+        bases.current[i]!.rotation.z = THREE.MathUtils.lerp(bases.current[i]!.rotation.z, fan, 0.18);
       }
-      if (middle.current[i]) middle.current[i]!.rotation.x = THREE.MathUtils.lerp(middle.current[i]!.rotation.x, -curl * 1.0, 0.2);
-      if (tips.current[i]) tips.current[i]!.rotation.x = THREE.MathUtils.lerp(tips.current[i]!.rotation.x, -curl * 0.75, 0.2);
+      if (middle.current[i]) middle.current[i]!.rotation.x = THREE.MathUtils.lerp(middle.current[i]!.rotation.x, -curl * 1.05, 0.18);
+      if (tips.current[i]) tips.current[i]!.rotation.x = THREE.MathUtils.lerp(tips.current[i]!.rotation.x, -curl * 0.78, 0.18);
     }
-    const thumbCurl = shape === "fist" ? 0.9 : shape === "bunch" ? 0.6 : shape === "point" ? 0.3 : 0;
-    if (thumbBase.current) thumbBase.current.rotation.z = THREE.MathUtils.lerp(thumbBase.current.rotation.z, side * (0.45 + thumbCurl * 0.65), 0.2);
-    if (thumbTip.current) thumbTip.current.rotation.x = THREE.MathUtils.lerp(thumbTip.current.rotation.x, -thumbCurl * 0.85, 0.2);
+    const thumbCurl = shape === "fist" ? 0.95 : shape === "bunch" ? 0.62 : shape === "point" ? 0.34 : 0;
+    if (thumbBase.current) {
+      thumbBase.current.rotation.z = THREE.MathUtils.lerp(thumbBase.current.rotation.z, side * (0.58 + thumbCurl * 0.62), 0.18);
+      thumbBase.current.rotation.x = THREE.MathUtils.lerp(thumbBase.current.rotation.x, -0.18 - thumbCurl * 0.32, 0.18);
+    }
+    if (thumbTip.current) thumbTip.current.rotation.x = THREE.MathUtils.lerp(thumbTip.current.rotation.x, -thumbCurl * 0.82, 0.18);
   });
 
   return (
-    <group position={[0, -0.04, 0]}>
-      <mesh castShadow>
-        <boxGeometry args={[0.072, 0.08, 0.028]} />
-        <meshStandardMaterial color={SKIN} roughness={0.55} />
+    <group position={[0, -0.035, 0]} rotation={[0.08, 0, side * -0.04]}>
+      {/* Rounded palm with a gently tapered wrist end */}
+      <mesh position={[0, -0.005, 0]} castShadow>
+        <capsuleGeometry args={[0.034, 0.045, 6, 12]} />
+        <meshStandardMaterial color={SKIN} roughness={0.48} />
       </mesh>
-      {[0, 1, 2, 3].map((i) => (
+      <mesh position={[0, -0.018, 0.001]} scale={[1.0, 0.58, 0.72]} castShadow>
+        <sphereGeometry args={[0.038, 24, 18]} />
+        <meshStandardMaterial color={SKIN} roughness={0.5} />
+      </mesh>
+      {fingerData.map((finger, i) => (
         <group
           key={i}
-          position={[(-0.026 + i * 0.0175), -0.044, 0]}
+          position={[finger.x, -0.025, 0.004]}
           ref={(g) => { if (g) bases.current[i] = g; }}
         >
-          <mesh position={[0, -0.02, 0]} castShadow>
-            <capsuleGeometry args={[0.008, 0.032, 4, 8]} />
-            <meshStandardMaterial color={SKIN} roughness={0.55} />
+          <mesh position={[0, -finger.length * 0.28, 0]} castShadow>
+            <capsuleGeometry args={[finger.radius, finger.length * 0.54, 5, 10]} />
+            <meshStandardMaterial color={SKIN} roughness={0.48} />
           </mesh>
-          <group position={[0, -0.038, 0]} ref={(g) => { if (g) middle.current[i] = g; }}>
-            <mesh position={[0, -0.016, 0]} castShadow>
-              <capsuleGeometry args={[0.007, 0.028, 4, 8]} />
-              <meshStandardMaterial color={SKIN} roughness={0.55} />
+          <mesh position={[0, -finger.length * 0.55, 0.001]} castShadow>
+            <sphereGeometry args={[finger.radius * 1.02, 12, 10]} />
+            <meshStandardMaterial color={SKIN} roughness={0.48} />
+          </mesh>
+          <group position={[0, -finger.length * 0.55, 0]} ref={(g) => { if (g) middle.current[i] = g; }}>
+            <mesh position={[0, -finger.length * 0.21, 0]} castShadow>
+              <capsuleGeometry args={[finger.radius * 0.91, finger.length * 0.4, 5, 10]} />
+              <meshStandardMaterial color={SKIN} roughness={0.48} />
             </mesh>
-            <group position={[0, -0.032, 0]} ref={(g) => { if (g) tips.current[i] = g; }}>
-              <mesh position={[0, -0.012, 0]} castShadow>
-                <capsuleGeometry args={[0.0065, 0.02, 4, 8]} />
-                <meshStandardMaterial color={SKIN} roughness={0.5} />
+            <group position={[0, -finger.length * 0.41, 0]} ref={(g) => { if (g) tips.current[i] = g; }}>
+              <mesh position={[0, -finger.length * 0.14, 0]} castShadow>
+                <capsuleGeometry args={[finger.radius * 0.82, finger.length * 0.27, 5, 10]} />
+                <meshStandardMaterial color={SKIN} roughness={0.46} />
               </mesh>
-              <mesh position={[0, -0.024, 0.004]}>
-                <capsuleGeometry args={[0.003, 0.007, 3, 6]} />
-                <meshStandardMaterial color={NAIL} roughness={0.35} />
+              <mesh position={[0, -finger.length * 0.27, 0.004]} scale={[0.72, 0.38, 0.25]}>
+                <sphereGeometry args={[finger.radius, 12, 8]} />
+                <meshStandardMaterial color={NAIL} roughness={0.38} />
               </mesh>
             </group>
           </group>
         </group>
       ))}
-      <group position={[0.04 * side, -0.005, 0.005]} rotation={[0, 0, -0.4 * side]} ref={thumbBase}>
-        <mesh position={[0.01 * side, -0.014, 0]} rotation={[0, 0, 0.4 * side]} castShadow>
-          <capsuleGeometry args={[0.009, 0.03, 4, 8]} />
-          <meshStandardMaterial color={SKIN} roughness={0.55} />
+      {/* Thumb has two articulated segments and an opposing angle */}
+      <group position={[side * 0.028, -0.005, 0.008]} rotation={[0.05, 0, side * -0.62]} ref={thumbBase}>
+        <mesh position={[side * 0.013, -0.012, 0]} rotation={[0, 0, side * 0.25]} castShadow>
+          <capsuleGeometry args={[0.009, 0.038, 5, 10]} />
+          <meshStandardMaterial color={SKIN} roughness={0.48} />
         </mesh>
-        <group position={[0.02 * side, -0.028, 0]} ref={thumbTip}>
-          <mesh position={[0.007 * side, -0.014, 0]} rotation={[0, 0, 0.25 * side]} castShadow>
-            <capsuleGeometry args={[0.0075, 0.022, 4, 8]} />
-            <meshStandardMaterial color={SKIN} roughness={0.55} />
+        <group position={[side * 0.026, -0.025, 0]} ref={thumbTip}>
+          <mesh position={[side * 0.012, -0.013, 0]} rotation={[0, 0, side * 0.2]} castShadow>
+            <capsuleGeometry args={[0.0078, 0.031, 5, 10]} />
+            <meshStandardMaterial color={SKIN} roughness={0.46} />
+          </mesh>
+          <mesh position={[side * 0.018, -0.028, 0.004]} scale={[0.7, 0.38, 0.25]}>
+            <sphereGeometry args={[0.0075, 12, 8]} />
+            <meshStandardMaterial color={NAIL} roughness={0.38} />
           </mesh>
         </group>
       </group>
@@ -209,7 +233,7 @@ function ArmRig({ side, poseRef }: { side: 1 | -1; poseRef: React.MutableRefObje
   return (
     <group ref={shoulder} position={[-0.2 * side, 1.38, 0]}>
       <mesh position={[0, -0.13, 0]} castShadow>
-        <capsuleGeometry args={[0.042, 0.18, 6, 12]} />
+        <capsuleGeometry args={[0.052, 0.19, 8, 16]} />
         <meshStandardMaterial color={SHIRT} roughness={0.8} />
       </mesh>
       <group ref={elbow} position={[0, -0.27, 0]}>
@@ -218,7 +242,7 @@ function ArmRig({ side, poseRef }: { side: 1 | -1; poseRef: React.MutableRefObje
           <meshStandardMaterial color={SHIRT} roughness={0.8} />
         </mesh>
         <mesh position={[0, -0.11, 0]} castShadow>
-          <capsuleGeometry args={[0.032, 0.17, 6, 12]} />
+          <capsuleGeometry args={[0.038, 0.18, 8, 16]} />
           <meshStandardMaterial color={SKIN} roughness={0.55} />
         </mesh>
         <group position={[0, -0.24, 0]}>
@@ -299,6 +323,13 @@ function Body({ pose }: { pose: Pose }) {
         </mesh>
       </group>
 
+      {/* Soft shoulder contours give the torso a less cylindrical silhouette */}
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * 0.145, 1.34, 0]} scale={[1.05, 0.8, 0.78]} castShadow>
+          <sphereGeometry args={[0.095, 24, 18]} />
+          <meshStandardMaterial color={SHIRT} roughness={0.78} />
+        </mesh>
+      ))}
       {/* Neck */}
       <mesh position={[0, 1.46, 0]}>
         <cylinderGeometry args={[0.04, 0.045, 0.07, 16]} />
@@ -307,7 +338,7 @@ function Body({ pose }: { pose: Pose }) {
 
       {/* Torso */}
       <mesh position={[0, 1.2, 0]} scale={[1, 1, 0.6]} castShadow>
-        <capsuleGeometry args={[0.155, 0.28, 8, 24]} />
+        <capsuleGeometry args={[0.18, 0.30, 10, 28]} />
         <meshStandardMaterial color={SHIRT} roughness={0.8} />
       </mesh>
 
