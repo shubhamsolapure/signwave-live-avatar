@@ -156,28 +156,28 @@ function Hand({ shapeRef, side }: { shapeRef: React.MutableRefObject<Shape>; sid
       {fingerData.map((finger, i) => (
         <group
           key={i}
-          position={[finger.x, 0.018, 0.004]}
+          position={[finger.x, -0.025, 0.004]}
           ref={(g) => { if (g) bases.current[i] = g; }}
         >
-          <mesh position={[0, finger.length * 0.28, 0]} castShadow>
+          <mesh position={[0, -finger.length * 0.28, 0]} castShadow>
             <capsuleGeometry args={[finger.radius, finger.length * 0.54, 5, 10]} />
             <meshStandardMaterial color={SKIN} roughness={0.48} />
           </mesh>
-          <mesh position={[0, finger.length * 0.55, 0.001]} castShadow>
+          <mesh position={[0, -finger.length * 0.55, 0.001]} castShadow>
             <sphereGeometry args={[finger.radius * 1.02, 12, 10]} />
             <meshStandardMaterial color={SKIN} roughness={0.48} />
           </mesh>
-          <group position={[0, finger.length * 0.55, 0]} ref={(g) => { if (g) middle.current[i] = g; }}>
-            <mesh position={[0, finger.length * 0.21, 0]} castShadow>
+          <group position={[0, -finger.length * 0.55, 0]} ref={(g) => { if (g) middle.current[i] = g; }}>
+            <mesh position={[0, -finger.length * 0.21, 0]} castShadow>
               <capsuleGeometry args={[finger.radius * 0.91, finger.length * 0.4, 5, 10]} />
               <meshStandardMaterial color={SKIN} roughness={0.48} />
             </mesh>
-            <group position={[0, finger.length * 0.41, 0]} ref={(g) => { if (g) tips.current[i] = g; }}>
-              <mesh position={[0, finger.length * 0.14, 0]} castShadow>
+            <group position={[0, -finger.length * 0.41, 0]} ref={(g) => { if (g) tips.current[i] = g; }}>
+              <mesh position={[0, -finger.length * 0.14, 0]} castShadow>
                 <capsuleGeometry args={[finger.radius * 0.82, finger.length * 0.27, 5, 10]} />
                 <meshStandardMaterial color={SKIN} roughness={0.46} />
               </mesh>
-              <mesh position={[0, finger.length * 0.27, 0.004]} scale={[0.72, 0.38, 0.25]}>
+              <mesh position={[0, -finger.length * 0.27, 0.004]} scale={[0.72, 0.38, 0.25]}>
                 <sphereGeometry args={[finger.radius, 12, 8]} />
                 <meshStandardMaterial color={NAIL} roughness={0.38} />
               </mesh>
@@ -187,16 +187,16 @@ function Hand({ shapeRef, side }: { shapeRef: React.MutableRefObject<Shape>; sid
       ))}
       {/* Thumb has two articulated segments and an opposing angle */}
       <group position={[side * 0.028, -0.005, 0.008]} rotation={[0.05, 0, side * -0.62]} ref={thumbBase}>
-        <mesh position={[side * 0.013, 0.012, 0]} rotation={[0, 0, side * 0.25]} castShadow>
+        <mesh position={[side * 0.013, -0.012, 0]} rotation={[0, 0, side * 0.25]} castShadow>
           <capsuleGeometry args={[0.009, 0.038, 5, 10]} />
           <meshStandardMaterial color={SKIN} roughness={0.48} />
         </mesh>
-        <group position={[side * 0.026, 0.025, 0]} ref={thumbTip}>
-          <mesh position={[side * 0.012, 0.013, 0]} rotation={[0, 0, side * 0.2]} castShadow>
+        <group position={[side * 0.026, -0.025, 0]} ref={thumbTip}>
+          <mesh position={[side * 0.012, -0.013, 0]} rotation={[0, 0, side * 0.2]} castShadow>
             <capsuleGeometry args={[0.0078, 0.031, 5, 10]} />
             <meshStandardMaterial color={SKIN} roughness={0.46} />
           </mesh>
-          <mesh position={[side * 0.018, 0.028, 0.004]} scale={[0.7, 0.38, 0.25]}>
+          <mesh position={[side * 0.018, -0.028, 0.004]} scale={[0.7, 0.38, 0.25]}>
             <sphereGeometry args={[0.0075, 12, 8]} />
             <meshStandardMaterial color={NAIL} roughness={0.38} />
           </mesh>
@@ -233,7 +233,7 @@ function ArmRig({ side, poseRef }: { side: 1 | -1; poseRef: React.MutableRefObje
   return (
     <group ref={shoulder} position={[-0.2 * side, 1.38, 0]}>
       <mesh position={[0, -0.13, 0]} castShadow>
-        <capsuleGeometry args={[0.042, 0.18, 6, 12]} />
+        <capsuleGeometry args={[0.052, 0.19, 8, 16]} />
         <meshStandardMaterial color={SHIRT} roughness={0.8} />
       </mesh>
       <group ref={elbow} position={[0, -0.27, 0]}>
@@ -242,7 +242,7 @@ function ArmRig({ side, poseRef }: { side: 1 | -1; poseRef: React.MutableRefObje
           <meshStandardMaterial color={SHIRT} roughness={0.8} />
         </mesh>
         <mesh position={[0, -0.11, 0]} castShadow>
-          <capsuleGeometry args={[0.032, 0.17, 6, 12]} />
+          <capsuleGeometry args={[0.038, 0.18, 8, 16]} />
           <meshStandardMaterial color={SKIN} roughness={0.55} />
         </mesh>
         <group position={[0, -0.24, 0]}>
@@ -323,6 +323,13 @@ function Body({ pose }: { pose: Pose }) {
         </mesh>
       </group>
 
+      {/* Soft shoulder contours give the torso a less cylindrical silhouette */}
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * 0.145, 1.34, 0]} scale={[1.05, 0.8, 0.78]} castShadow>
+          <sphereGeometry args={[0.095, 24, 18]} />
+          <meshStandardMaterial color={SHIRT} roughness={0.78} />
+        </mesh>
+      ))}
       {/* Neck */}
       <mesh position={[0, 1.46, 0]}>
         <cylinderGeometry args={[0.04, 0.045, 0.07, 16]} />
@@ -331,7 +338,7 @@ function Body({ pose }: { pose: Pose }) {
 
       {/* Torso */}
       <mesh position={[0, 1.2, 0]} scale={[1, 1, 0.6]} castShadow>
-        <capsuleGeometry args={[0.155, 0.28, 8, 24]} />
+        <capsuleGeometry args={[0.18, 0.30, 10, 28]} />
         <meshStandardMaterial color={SHIRT} roughness={0.8} />
       </mesh>
 
