@@ -90,7 +90,7 @@ export const APPROVED_SIGNS: Record<string, Sign> = {
   are: { word: "Are", emoji: "❓", how: "Illustrative. Often combined with other signs in real ISL.", video: "" },
   is: { word: "Is", emoji: "❓", how: "Illustrative. Often combined with other signs in real ISL.", video: "" },
   am: { word: "Am", emoji: "❓", how: "Illustrative. Often combined with other signs in real ISL.", video: "" },
-  you: { word: "You", emoji: "👉", how: "Point toward the other person.", video: "" },
+  // “You” is intentionally not mapped to a guessed pose; it falls back to fingerspelling until the exact ISL entry is reviewed.
   this: { word: "This", emoji: "☝️", how: "Illustrative pointing gesture.", video: "" },
   that: { word: "That", emoji: "👉", how: "Illustrative pointing gesture.", video: "" },
   time: { word: "Time", emoji: "⏰", how: "Illustrative. Check official dictionary.", video: "" },

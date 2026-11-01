@@ -7,10 +7,10 @@ import { translate, APPROVED_SIGNS, ISLRTC_ALPHABET_VIDEO, type Step } from "@/l
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Saanjh — Voice & Text to Indian Sign Language" },
-      { name: "description", content: "Explore Indian Sign Language dictionary clips and fingerspelling for typed or spoken text." },
-      { property: "og:title", content: "Saanjh — Voice & Text to ISL" },
-      { property: "og:description", content: "A prototype for exploring ISL dictionary clips and fingerspelling from speech or text." },
+      { title: "SignWave Live Avatar — Voice & Text to ISL" },
+      { name: "description", content: "Explore official ISL dictionary references and an experimental 3D avatar for typed or spoken input." },
+      { property: "og:title", content: "SignWave Live Avatar — Voice & Text to ISL" },
+      { property: "og:description", content: "A prototype for exploring official ISL references and experimental 3D gestures from speech or text." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -54,7 +54,7 @@ function toFrames(steps: Step[]): Frame[] {
       : s.letters.map((l, i) => ({
           label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
           big: l,
-          how: `Fingerspell the letter ${l} with ISL two-hand alphabet.`,
+          how: `Experimental avatar letter pose for ${l}. Check the official ISLRTC alphabet reference for the correct handshape and movement.`,
           verified: false,
           validatedAnimation: false,
           word: null,
@@ -70,7 +70,7 @@ function Index() {
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [listening, setListening] = useState(false);
-  const [mode, setMode] = useState<"hybrid" | "avatar">("avatar");
+  const [mode, setMode] = useState<"hybrid" | "avatar">("hybrid");
   const [micOk, setMicOk] = useState(true);
   const [voiceError, setVoiceError] = useState("");
   const [slowPlayback, setSlowPlayback] = useState(false);
@@ -78,6 +78,7 @@ function Index() {
   const [officialQuery, setOfficialQuery] = useState("");
   const recRef = useRef<any>(null);
   const transcriptRef = useRef("");
+  const recognitionErrorRef = useRef(false);
 
   useEffect(() => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -88,21 +89,21 @@ function Index() {
     r.continuous = false;
     r.onresult = (e: any) => {
       const results = Array.from(e.results as ArrayLike<any>);
-      const transcript = results.map((x: any) => x[0]?.transcript ?? "").join(" ").replace(/\\s+/g, " ").trim();
+      const transcript = results.map((x: any) => x[0]?.transcript ?? "").join(" ").replace(/\s+/g, " ").trim();
       transcriptRef.current = transcript;
       setText(transcript);
     };
     r.onerror = (e: any) => {
+      recognitionErrorRef.current = true;
       setVoiceError(e?.error === "not-allowed" ? "Microphone access was blocked. Allow microphone access in your browser settings." : `Voice input error: ${e?.error ?? "please try again"}.`);
       setListening(false);
     };
     r.onend = () => {
       setListening(false);
       // Prefer the recognizer's transcript over querying the first textarea in the DOM.
-      const finalText = transcriptRef.current.trim() ||
-        (document.querySelector("textarea") as HTMLTextAreaElement | null)?.value?.trim() || "";
+      const finalText = transcriptRef.current.trim();
       if (finalText) go(finalText);
-      else setVoiceError("No speech was detected. Try again or type your message.");
+      else if (!recognitionErrorRef.current) setVoiceError("No speech was detected. Try again or type your message.");
     };
     recRef.current = r;
   }, []);
@@ -127,6 +128,7 @@ function Index() {
     if (listening) { recRef.current.stop(); return; }
     setVoiceError("");
     transcriptRef.current = "";
+    recognitionErrorRef.current = false;
     try {
       recRef.current.start();
       setListening(true);
@@ -163,13 +165,13 @@ function Index() {
     <main className="min-h-screen bg-background px-4 py-8">
       <div className="mx-auto max-w-xl space-y-6">
         <header>
-          <p className="text-sm font-semibold uppercase tracking-widest text-primary">Saanjh</p>
+          <p className="text-sm font-semibold uppercase tracking-widest text-primary">SignWave Live Avatar</p>
           <h1 className="font-display text-4xl leading-tight text-foreground">Speak or type.<br />See it in sign.</h1>
           <p className="mt-2 text-muted-foreground">The full-body 3D avatar has a procedural two-hand rig with individually articulated fingers. Its movements are illustrative prototypes, not motion-captured or expert-validated ISL. Official dictionary clips are linked where available; sentence grammar and fingerspelling still need expert review.</p>
         </header>
 
         <div className="mode-toggle" role="tablist">
-          <button className={mode === "hybrid" ? "mode-on" : "mode-off"} onClick={() => setMode("hybrid")}>Hybrid · verified-first</button>
+          <button className={mode === "hybrid" ? "mode-on" : "mode-off"} onClick={() => setMode("hybrid")}>Official references first</button>
           <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>Experimental 3D avatar</button>
         </div>
         <div className="avatar-frame">
@@ -199,7 +201,7 @@ function Index() {
             )
           ) : (
           <ClientOnly fallback={null}>
-            <Suspense fallback={null}>
+            <Suspense fallback={<div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Loading 3D avatar…</div>}>
               <Signer3D word={cur?.word ?? null} spelling={!!cur && !cur.word} letter={cur?.big} />
             </Suspense>
           </ClientOnly>
