@@ -26,8 +26,6 @@ export const APPROVED_SIGNS: Record<string, Sign> = {
   me: { word: "I / Me", emoji: "👉", how: "Point index finger at your own chest.", video: "1f6OchgCQrE" },
   my: { word: "My", emoji: "✋", how: "Flat palm placed on your chest.", video: "EI3Z7yP6_JQ" },
   your: { word: "Your", emoji: "✋", how: "Flat palm pushed toward the other person.", video: "Yc0Mx7DJ_Io" },
-  // The dictionary has a distinct “You” entry. This currently reuses the mapped “Your” reference clip as a provisional related clip; validate the clip against the exact “You” entry before marking it verified.
-  you: { word: "You (related reference — verify context)", emoji: "👉", how: "Pronoun signs depend on direction and context. This is a related reference clip, not yet independently verified as the exact “You” entry.", video: "Yc0Mx7DJ_Io" },
   name: { word: "Name", emoji: "✌️", how: "Two fingers of one hand tap across two fingers of the other.", video: "SjfLsGRnuGo" },
   what: { word: "What", emoji: "🤷", how: "Index finger raised, shake it slightly side to side with a questioning face.", video: "4accXsYqRnA" },
   where: { word: "Where", emoji: "🤷", how: "Open palms facing up, move them outward with raised eyebrows.", video: "8wgrPnyzpMw" },
@@ -166,7 +164,9 @@ export function translate(text: string): Step[] {
     .replace(/\bhowareyou\b/g, "how are you")
     .replace(/\biloveyou\b/g, "i love you")
     .replace(/\bpleasehelp\b/g, "please help")
-    .replace(/\bneedhelp\b/g, "need help");
+    .replace(/\bneedhelp\b/g, "need help")
+    // “Thank you” already maps to one dictionary clip; avoid replaying a second “you” step.
+    .replace(/\bthank you\b/g, "thank");
 
   if (!cleaned) return [];
 

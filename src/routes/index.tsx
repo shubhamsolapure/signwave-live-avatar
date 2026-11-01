@@ -186,7 +186,7 @@ function Index() {
                 <p className="font-semibold text-foreground">Look up “{cur.word ?? cur.label}” in the official dictionary</p>
                 <p className="max-w-md text-sm text-muted-foreground">This word does not have a locally mapped clip in SignWave yet. Open the official ISLRTC dictionary entry when available, or search the official collection. Check the meaning and any regional or alternate sign before using it.</p>
                 <form className="flex w-full max-w-md gap-2" onSubmit={(e) => { e.preventDefault(); const term = (officialQuery.trim() || cur.word || cur.label).replace(/^Spell ["“]|["”] ·.*$/g, "").trim(); if (term) window.open(`https://www.youtube.com/@islrtcnewdelhi4069/search?query=${encodeURIComponent(term)}`, "_blank", "noopener,noreferrer"); }}>
-                  <input className="field min-w-0 flex-1" value={officialQuery || cur.word || cur.label} onChange={(e) => setOfficialQuery(e.target.value)} aria-label="Search official ISLRTC sign videos" placeholder="Search a word or phrase…" />
+                  <input className="field min-w-0 flex-1" value={officialQuery} onChange={(e) => setOfficialQuery(e.target.value)} aria-label="Search official ISLRTC sign videos" placeholder={cur.word || cur.label || "Search a word or phrase…"} />
                   <button className="btn-primary" type="submit">Find videos ↗</button>
                 </form>
                 <a className="chip" href={`https://www.youtube.com/@islrtcnewdelhi4069/search?query=${encodeURIComponent(cur.word || cur.label)}`} target="_blank" rel="noreferrer">Search this word in ISLRTC videos ↗</a>
