@@ -119,7 +119,11 @@ function Hand({ shapeRef, side }: { shapeRef: React.MutableRefObject<Shape>; sid
       shape === "bunch" ? (i === 0 ? 0.3 : 0.65) : 0;
     for (let i = 0; i < 4; i++) {
       const curl = curlFor(i);
-      if (bases.current[i]) bases.current[i]!.rotation.x = THREE.MathUtils.lerp(bases.current[i]!.rotation.x, -curl * 0.9, 0.2);
+      const fan = (i - 1.5) * (shape === "open" ? 0.11 : 0.025);
+      if (bases.current[i]) {
+        bases.current[i]!.rotation.x = THREE.MathUtils.lerp(bases.current[i]!.rotation.x, -curl * 0.9, 0.2);
+        bases.current[i]!.rotation.z = THREE.MathUtils.lerp(bases.current[i]!.rotation.z, fan, 0.2);
+      }
       if (middle.current[i]) middle.current[i]!.rotation.x = THREE.MathUtils.lerp(middle.current[i]!.rotation.x, -curl * 1.0, 0.2);
       if (tips.current[i]) tips.current[i]!.rotation.x = THREE.MathUtils.lerp(tips.current[i]!.rotation.x, -curl * 0.75, 0.2);
     }
@@ -135,7 +139,11 @@ function Hand({ shapeRef, side }: { shapeRef: React.MutableRefObject<Shape>; sid
         <meshStandardMaterial color={SKIN} roughness={0.55} />
       </mesh>
       {[0, 1, 2, 3].map((i) => (
-        <group key={i} position={[(-0.026 + i * 0.0175), -0.044, 0]} ref={(g) => { if (g) bases.current[i] = g; }}>
+        <group
+          key={i}
+          position={[(-0.026 + i * 0.0175), -0.044, 0]}
+          ref={(g) => { if (g) bases.current[i] = g; }}
+        >
           <mesh position={[0, -0.02, 0]} castShadow>
             <capsuleGeometry args={[0.008, 0.032, 4, 8]} />
             <meshStandardMaterial color={SKIN} roughness={0.55} />
