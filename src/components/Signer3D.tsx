@@ -1,6 +1,6 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, ContactShadows } from "@react-three/drei";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 // Arm pose: [shoulderX (neg = forward/up), shoulderZ (inward), elbowX (neg = bend)]
@@ -392,7 +392,31 @@ function spellingPose(letter: string | undefined): Pose {
 }
 
 export default function Signer3D({ word, spelling, letter }: { word: string | null; spelling: boolean; letter?: string }) {
-  const pose = spelling ? spellingPose(letter) : (word && POSES[word]) || IDLE_POSE;
+  const normalizedWord = word?.trim();
+  const exactPose = normalizedWord
+    ? POSES[normalizedWord] ?? Object.entries(POSES).find(([key]) => key.toLowerCase() === normalizedWord.toLowerCase())?.[1]
+    : undefined;
+  const [fallbackLetterIndex, setFallbackLetterIndex] = useState(0);
+  const shouldSpellWord = Boolean(normalizedWord && !exactPose && !spelling);
+
+  // When no authored pose exists, spell the whole word in the 3D character
+  // rather than leaving the body in a neutral pose or inventing a sign.
+  useEffect(() => {
+    setFallbackLetterIndex(0);
+    if (!shouldSpellWord || !normalizedWord) return;
+    const timer = window.setInterval(() => {
+      setFallbackLetterIndex((index) => (index + 1) % normalizedWord.length);
+    }, 650);
+    return () => window.clearInterval(timer);
+  }, [normalizedWord, shouldSpellWord]);
+
+  const pose = spelling
+    ? spellingPose(letter)
+    : exactPose
+      ? exactPose
+      : shouldSpellWord && normalizedWord
+        ? spellingPose(normalizedWord[fallbackLetterIndex])
+        : IDLE_POSE;
   return (
     <Canvas shadows camera={{ position: [0, 1.15, 4.4], fov: 28 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(0, 1.18, 0)}>
       <color attach="background" args={["#f0e6d8"]} />
