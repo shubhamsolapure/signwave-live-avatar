@@ -210,13 +210,13 @@ function Index() {
         <section className="stage" aria-live="polite">
           {cur ? (
             <>
-              <span className={(mode === "hybrid" && cur.validatedAnimation) || (mode === "hybrid" && cur.video) ? "badge-verified" : "badge-spell"}>{badgeText}</span>
+              <span className={mode === "hybrid" && cur.validatedAnimation ? "badge-verified" : "badge-spell"}>{badgeText}</span>
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
               {mode === "avatar" && cur.video && (
                 <button
                   className="btn-primary mt-2"
-                  onClick={() => setMode("real")}
+                  onClick={() => setMode("hybrid")}
                   aria-label={`Watch official ISLRTC reference for ${cur.label}`}
                 >
                   Watch official ISL reference for “{cur.label}” ↗
