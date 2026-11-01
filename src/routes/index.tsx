@@ -142,6 +142,14 @@ function Index() {
     items: group.items.filter((phrase) => phrase.toLowerCase().includes(phraseQuery.toLowerCase().trim())),
   })).filter((group) => group.items.length > 0);
 
+  // Clear badge text based on status
+  const badgeText = (() => {
+    if (mode === "real" && cur?.video) return "✅ Official ISLRTC dictionary video";
+    if (cur?.word && cur?.video) return "✅ Verified sign · official video linked";
+    if (cur?.word) return "⚠️ Experimental 3D gesture · NOT verified ISL";
+    return "🔤 Fingerspelling · handshape not validated";
+  })();
+
   return (
     <main className="min-h-screen bg-background px-4 py-8">
       <div className="mx-auto max-w-xl space-y-6">
@@ -192,7 +200,7 @@ function Index() {
         <section className="stage" aria-live="polite">
           {cur ? (
             <>
-              <span className={mode === "real" && cur.video ? "badge-verified" : "badge-spell"}>{mode === "real" && cur.video ? "Official ISLRTC dictionary reference video" : cur.word && cur.video ? "Experimental avatar gesture · official reference linked" : cur.word ? "Experimental 3D gesture · NOT verified ISL" : "Fingerspelling prototype · handshape not validated"}</span>
+              <span className={cur.verified || (mode === "real" && cur.video) ? "badge-verified" : "badge-spell"}>{badgeText}</span>
               <div className="key-in text-5xl font-display" key={idx}>{cur.big}</div>
               <p className="text-2xl font-display text-foreground">{cur.label}</p>
               {!(mode === "real" && cur.verified) && <p className="text-muted-foreground">{cur.how}</p>}
@@ -202,10 +210,11 @@ function Index() {
                 </a>
               )}
               <div className="flex w-full items-center gap-2 pt-2">
-                <button className="btn-ghost" onClick={() => { setPlaying(false); setIdx((i) => Math.max(0, i - 1)); }}>‹</button>
+                <button className="btn-ghost" onClick={() => { setPlaying(false); setIdx((i) => Math.max(0, i - 1)); }} aria-label="Previous">‹</button>
                 <div className="h-2 flex-1 rounded-full bg-muted"><div className="h-2 rounded-full bg-primary transition-all" style={{ width: `${((idx + 1) / frames.length) * 100}%` }} /></div>
-                <button className="btn-ghost" onClick={() => { setPlaying(false); setIdx((i) => Math.min(frames.length - 1, i + 1)); }}>›</button>
-                <button className="btn-ghost" onClick={() => { if (idx >= frames.length - 1) setIdx(0); setPlaying(!playing); }}>{playing ? "❚❚" : "▶"}</button>
+                <button className="btn-ghost" onClick={() => { setPlaying(false); setIdx((i) => Math.min(frames.length - 1, i + 1)); }} aria-label="Next">›</button>
+                <button className="btn-ghost" onClick={() => { if (idx >= frames.length - 1) setIdx(0); setPlaying(!playing); }} aria-label={playing ? "Pause" : "Play"}>{playing ? "❚❚" : "▶"}</button>
+                <button className="btn-ghost" onClick={() => { setIdx(0); setPlaying(true); }} aria-label="Play again">↻</button>
               </div>
             </>
           ) : (
@@ -220,9 +229,9 @@ function Index() {
             <p className="text-sm text-muted-foreground">This sequence is word-by-word assistance, not a validated ISL sentence. Grammar, negation, questions, names, and context may need a fluent signer.</p>
             <a className="chip inline-flex" href={`https://www.youtube.com/@islrtcnewdelhi4069/search?query=${encodeURIComponent(text.trim())}`} target="_blank" rel="noreferrer">Search official ISLRTC videos for the whole message ↗</a>
             <p className="text-xs text-muted-foreground">If there is no exact sentence result, search important words separately. ISL does not always follow English word order.</p>
-            <label className="flex items-center gap-2 text-sm text-foreground">
+            <label className="flex items-center gap-2 text-sm text-foreground font-medium">
               <input type="checkbox" checked={slowPlayback} onChange={(e) => setSlowPlayback(e.target.checked)} />
-              Slower playback
+              Slow playback (recommended for learning)
             </label>
           </section>
         )}
