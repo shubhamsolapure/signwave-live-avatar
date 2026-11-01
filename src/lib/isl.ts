@@ -175,7 +175,17 @@ export function translate(text: string): Step[] {
     .replace(/[^a-z0-9\s']/g, " ")
     .replace(/'/g, "")
     .replace(/\s+/g, " ")
-    .trim();
+    .trim()
+    // Normalize common joined-up speech/text phrases before matching.
+    // This lets "thankyou" and "goodmorning" reach their mapped reference clips.
+    .replace(/\bthankyou\b/g, "thank you")
+    .replace(/\bthanksalot\b/g, "thanks a lot")
+    .replace(/\bgoodmorning\b/g, "good morning")
+    .replace(/\bgoodnight\b/g, "good night")
+    .replace(/\bhowareyou\b/g, "how are you")
+    .replace(/\biloveyou\b/g, "i love you")
+    .replace(/\bpleasehelp\b/g, "please help")
+    .replace(/\bneedhelp\b/g, "need help");
 
   if (!cleaned) return [];
 
