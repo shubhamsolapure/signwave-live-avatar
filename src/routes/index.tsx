@@ -70,7 +70,7 @@ function Index() {
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [listening, setListening] = useState(false);
-  const [mode, setMode] = useState<"hybrid" | "avatar">("hybrid");
+  const [mode, setMode] = useState<"hybrid" | "avatar">("avatar");
   const [micOk, setMicOk] = useState(true);
   const [voiceError, setVoiceError] = useState("");
   const [slowPlayback, setSlowPlayback] = useState(false);
@@ -171,8 +171,8 @@ function Index() {
         </header>
 
         <div className="mode-toggle" role="tablist">
-          <button className={mode === "hybrid" ? "mode-on" : "mode-off"} onClick={() => setMode("hybrid")}>Official references first</button>
-          <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>Experimental 3D avatar</button>
+          <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>3D Avatar (default)</button>
+          <button className={mode === "hybrid" ? "mode-on" : "mode-off"} onClick={() => setMode("hybrid")}>Official video reference</button>
         </div>
         <div className="avatar-frame">
           {mode === "hybrid" && !cur?.validatedAnimation ? (
