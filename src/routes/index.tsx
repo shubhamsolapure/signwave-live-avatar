@@ -119,7 +119,18 @@ const OFFICIAL_ISL_LOOKUPS: Record<string, { label: string; url: string }> = {
 // DEF video IDs are mapped only when a specific relevant video was found.
 // Other terms use the DEF channel's search page instead of inventing a video ID.
 const DEF_ISL_VIDEO_LOOKUPS: Record<string, { label: string; video: string }> = {
+  // Exact topic videos confirmed from Deaf Enabled Foundation's public posts.
   "family": { label: "Draw your family big with ISL · Deaf Enabled Foundation", video: "FQZGP0nSyOI" },
+  "hello": { label: "Test Your Greetings Skills · Deaf Enabled Foundation", video: "erJK6HGuKkQ" },
+  "hi": { label: "Test Your Greetings Skills · Deaf Enabled Foundation", video: "erJK6HGuKkQ" },
+  "how are you": { label: "Test Your Greetings Skills · Deaf Enabled Foundation", video: "erJK6HGuKkQ" },
+  "flick": { label: "Flick (verb) · Indian Sign Language · Deaf Enabled Foundation", video: "J7pMMOn53O0" },
+  // These are instructional clips covering several verbs, not isolated word-only clips.
+  "squeeze": { label: "Make Sentences With These Action Verbs · Deaf Enabled Foundation", video: "38tk8mtAUA8" },
+  "pour": { label: "Make Sentences With These Action Verbs · Deaf Enabled Foundation", video: "38tk8mtAUA8" },
+  "rub": { label: "Make Sentences With These Action Verbs · Deaf Enabled Foundation", video: "38tk8mtAUA8" },
+  "spill": { label: "Make Sentences With These Action Verbs · Deaf Enabled Foundation", video: "38tk8mtAUA8" },
+  "apply": { label: "Make Sentences With These Action Verbs · Deaf Enabled Foundation", video: "38tk8mtAUA8" },
 };
 
 type Frame = { label: string; big: string; how: string; verified: boolean; validatedAnimation: boolean; word: string | null; video: string | null; lookupUrl: string | null };
@@ -128,16 +139,27 @@ function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
       ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()]?.video || s.sign.video || null, lookupUrl: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()] || s.sign.video ? null : `https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(s.sign.word)}` }]
-      : s.letters.map((l, i) => ({
-          label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
-          big: l,
-          how: `Experimental avatar letter pose for ${l}. Check the official ISLRTC alphabet reference for the correct handshape and movement.`,
-          verified: false,
-          validatedAnimation: false,
-          word: null,
-          video: null,
-          lookupUrl: `https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(s.source)}`,
-        })),
+      : DEF_ISL_VIDEO_LOOKUPS[s.source.toLowerCase()]
+        ? [{
+            label: s.source,
+            big: s.source.toUpperCase(),
+            how: DEF_ISL_VIDEO_LOOKUPS[s.source.toLowerCase()].label,
+            verified: false,
+            validatedAnimation: false,
+            word: s.source,
+            video: DEF_ISL_VIDEO_LOOKUPS[s.source.toLowerCase()].video,
+            lookupUrl: null,
+          }]
+        : s.letters.map((l, i) => ({
+            label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
+            big: l,
+            how: `Experimental avatar letter pose for ${l}. Check a human ISL alphabet reference for the correct handshape and movement.`,
+            verified: false,
+            validatedAnimation: false,
+            word: null,
+            video: null,
+            lookupUrl: `https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(s.source)}`,
+          })),
   );
 }
 
@@ -232,7 +254,7 @@ function Index() {
   // Clear badge text based on status
   const badgeText = (() => {
     if (mode === "hybrid" && cur?.validatedAnimation) return "✅ ISL animation reviewed and validated";
-    if (mode === "hybrid" && cur?.video) return "📹 Official reference video · 3D sign not yet validated";
+    if (mode === "hybrid" && cur?.video) return "📹 Reference video · sign match not independently validated";
     if (mode === "avatar" && cur?.word && cur?.video) return "⚠️ Experimental 3D pose/fingerspelling · NOT validated ISL";
     if (mode === "avatar" && cur?.word) return "⚠️ Experimental 3D pose/fingerspelling · NOT verified ISL";
     return "🔤 Fingerspelling · handshape not validated";
