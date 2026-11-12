@@ -139,7 +139,7 @@ type Frame = { label: string; big: string; how: string; verified: boolean; valid
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()]?.video || s.sign.video || null, lookupUrl: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()] || s.sign.video ? null : `https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(s.sign.word)}` }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: s.sign.video || DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()]?.video || null, lookupUrl: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()] || s.sign.video ? null : `https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(s.sign.word)}` }]
       : DEF_ISL_VIDEO_LOOKUPS[s.source.toLowerCase()]
         ? [{
             label: s.source,
@@ -254,8 +254,8 @@ function Index() {
 
   // Clear badge text based on status
   const badgeText = (() => {
-    if (mode === "hybrid" && cur?.validatedAnimation) return "✅ ISL animation reviewed and validated";
-    if (mode === "hybrid" && cur?.video) return "📹 Reference video · sign match not independently validated";
+    if (mode === "hybrid" && cur?.validatedAnimation) return "ISL animation reviewed and validated";
+    if (mode === "hybrid" && cur?.video) return "Reference video · confirm the sign and context";
     if (mode === "avatar" && cur?.word && cur?.video) return "⚠️ Experimental 3D pose/fingerspelling · NOT validated ISL";
     if (mode === "avatar" && cur?.word) return "⚠️ Experimental 3D pose/fingerspelling · NOT verified ISL";
     return "🔤 Fingerspelling · handshape not validated";
@@ -267,11 +267,11 @@ function Index() {
         <header>
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">SignWave Live Avatar · ISL learning prototype</p>
           <h1 className="font-display text-4xl leading-tight text-foreground">Speak or type.<br />See it in sign.</h1>
-          <p className="mt-2 text-muted-foreground">The full-body 3D avatar has a procedural two-hand rig with individually articulated fingers. Its movements are illustrative prototypes, not motion-captured or expert-validated ISL. Official dictionary clips are linked where available; sentence grammar and fingerspelling still need expert review.</p>
+          <p className="mt-2 text-muted-foreground">The full-body 3D avatar has a procedural two-hand rig with individually articulated fingers. Its movements are illustrative prototypes, not motion-captured or expert-validated ISL. Reference videos are shown where mapped. Word-by-word output is a learning aid, not a validated sentence-level ISL translation.</p>
         </header>
 
         <div className="mode-toggle" role="group" aria-label="Choose sign display mode">
-          <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>3D Avatar (default)</button>
+          <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>3D Avatar (experimental)</button>
           <button className={mode === "hybrid" ? "mode-on" : "mode-off"} onClick={() => setMode("hybrid")}>Official video reference</button>
         </div>
         <div className="avatar-frame">
@@ -302,14 +302,14 @@ function Index() {
                     <span className="font-display text-6xl text-foreground">{cur.big}</span>
                     <p className="font-semibold text-foreground">Look up “{cur.word}” in the official dictionary</p>
                     <p className="max-w-md text-sm text-muted-foreground">No mapped clip is available yet. Search Deaf Enabled Foundation videos and confirm the correct ISL meaning before use.</p>
-                    <a className="chip" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(cur.word)}`} target="_blank" rel="noreferrer">Search official ISLRTC videos ↗</a>
+                    <a className="chip" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(cur.word)}`} target="_blank" rel="noreferrer">Search Deaf Enabled Foundation videos ↗</a>
                     <a className="chip" href="https://def.org.in/def-isl-app/" target="_blank" rel="noreferrer">Explore DEF-ISL reference ↗</a>
                     <a className="chip" href="https://divyangjan.depwd.gov.in/islrtc/" target="_blank" rel="noreferrer">Open official ISL dictionary ↗</a>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Select a message to explore a dictionary clip or an illustrative 3D gesture</div>
+              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Select a message to explore a reference video or an experimental 3D gesture</div>
             )
           ) : (
           <ClientOnly fallback={null}>
@@ -344,7 +344,7 @@ function Index() {
               {(mode === "avatar" || !cur.video) && <p className="text-muted-foreground">{cur.how}</p>}
               {cur.lookupUrl && (
                 <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">
-                  "Search Deaf Enabled Foundation videos ↗"
+                  Search Deaf Enabled Foundation videos ↗
                 </a>
               )}
               <div className="flex w-full items-center gap-2 pt-2">
@@ -365,8 +365,8 @@ function Index() {
             <p className="text-sm font-semibold text-foreground">Original message (keep this visible)</p>
             <p className="text-lg text-foreground break-words">{text}</p>
             <p className="text-sm text-muted-foreground">This sequence is word-by-word assistance, not a validated ISL sentence. Grammar, negation, questions, names, and context may need a fluent signer.</p>
-            <a className="chip inline-flex" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(text.trim())}`} target="_blank" rel="noreferrer">Search official ISLRTC videos for the whole message ↗</a>
-            <a className="chip inline-flex" href={`https://www.google.com/search?q=${encodeURIComponent(`site:divyangjan.depwd.gov.in/islrtc ${text.trim()}`)}`} target="_blank" rel="noreferrer">Search official dictionary entries for the whole message ↗</a>
+            <a className="chip inline-flex" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(text.trim())}`} target="_blank" rel="noreferrer">Search Deaf Enabled Foundation videos for the whole message ↗</a>
+            <a className="chip inline-flex" href={`https://www.google.com/search?q=${encodeURIComponent(`site:divyangjan.depwd.gov.in/islrtc ${text.trim()}`)}`} target="_blank" rel="noreferrer">Search ISLRTC dictionary entries for the whole message ↗</a>
             <p className="text-xs text-muted-foreground">If there is no exact sentence result, search important words separately. ISL does not always follow English word order.</p>
             <label className="flex items-center gap-2 text-sm text-foreground font-medium">
               <input type="checkbox" checked={slowPlayback} onChange={(e) => setSlowPlayback(e.target.checked)} />
@@ -376,7 +376,9 @@ function Index() {
         )}
 
         <section className="space-y-3">
-          <label htmlFor="message-input" className="text-sm font-semibold text-foreground">Your message</label>\n          <textarea id="message-input" className="field" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="For example: Hello, I need help…" aria-describedby="message-help" />\n          <p id="message-help" className="text-sm text-muted-foreground">Type a short message or choose a quick phrase below. Then select Translate to view available references.</p>
+          <label htmlFor="message-input" className="text-sm font-semibold text-foreground">Your message</label>
+          <textarea id="message-input" className="field" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="For example: Hello, I need help…" aria-describedby="message-help" />
+          <p id="message-help" className="text-sm text-muted-foreground">Type a short message or choose a quick phrase below. Then select Translate to view available references.</p>
           {voiceError && <p role="alert" className="text-sm text-destructive">{voiceError}</p>}
           <div className="flex gap-3">
             <button className="btn-primary flex-1" onClick={() => go()} disabled={!text.trim()}>Translate text to sign</button>
@@ -402,11 +404,18 @@ function Index() {
             <h2 className="text-xl font-display text-foreground">Additional official ISLRTC dictionary entries</h2>
             <p className="text-sm text-muted-foreground">Browse 24 more official dictionary entry pages. These open on the Government of India dictionary site; they are not counted as bundled local video clips unless separately imported and checked.</p>
           </div>
+          <label htmlFor="official-entry-search" className="text-sm font-semibold text-foreground">Search dictionary entries</label>
+          <input id="official-entry-search" className="field" value={officialQuery} onChange={(e) => setOfficialQuery(e.target.value)} placeholder="Search words like water, hospital, morning…" aria-label="Search official dictionary entries" />
           <div className="flex flex-wrap gap-2">
-            {Object.entries(OFFICIAL_ISL_LOOKUPS).map(([key, entry]) => (
-              <a key={key} className="chip" href={entry.url} target="_blank" rel="noreferrer">{entry.label} ↗</a>
-            ))}
+            {Object.entries(OFFICIAL_ISL_LOOKUPS)
+              .filter(([key, entry]) => `${key} ${entry.label}`.toLowerCase().includes(officialQuery.trim().toLowerCase()))
+              .map(([key, entry]) => (
+                <a key={key} className="chip" href={entry.url} target="_blank" rel="noreferrer">{entry.label} ↗</a>
+              ))}
           </div>
+          {Object.entries(OFFICIAL_ISL_LOOKUPS).filter(([key, entry]) => `${key} ${entry.label}`.toLowerCase().includes(officialQuery.trim().toLowerCase())).length === 0 && (
+            <p className="text-sm text-muted-foreground">No matching local links. Try another word or use the full ISLRTC dictionary above.</p>
+          )}
         </section>
 
         <section className="rounded-2xl border bg-card p-4 space-y-4">
