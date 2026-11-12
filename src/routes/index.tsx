@@ -404,11 +404,18 @@ function Index() {
             <h2 className="text-xl font-display text-foreground">Additional official ISLRTC dictionary entries</h2>
             <p className="text-sm text-muted-foreground">Browse 24 more official dictionary entry pages. These open on the Government of India dictionary site; they are not counted as bundled local video clips unless separately imported and checked.</p>
           </div>
+          <label htmlFor="official-entry-search" className="text-sm font-semibold text-foreground">Search dictionary entries</label>
+          <input id="official-entry-search" className="field" value={officialQuery} onChange={(e) => setOfficialQuery(e.target.value)} placeholder="Search words like water, hospital, morning…" aria-label="Search official dictionary entries" />
           <div className="flex flex-wrap gap-2">
-            {Object.entries(OFFICIAL_ISL_LOOKUPS).map(([key, entry]) => (
-              <a key={key} className="chip" href={entry.url} target="_blank" rel="noreferrer">{entry.label} ↗</a>
-            ))}
+            {Object.entries(OFFICIAL_ISL_LOOKUPS)
+              .filter(([key, entry]) => `${key} ${entry.label}`.toLowerCase().includes(officialQuery.trim().toLowerCase()))
+              .map(([key, entry]) => (
+                <a key={key} className="chip" href={entry.url} target="_blank" rel="noreferrer">{entry.label} ↗</a>
+              ))}
           </div>
+          {Object.entries(OFFICIAL_ISL_LOOKUPS).filter(([key, entry]) => `${key} ${entry.label}`.toLowerCase().includes(officialQuery.trim().toLowerCase())).length === 0 && (
+            <p className="text-sm text-muted-foreground">No matching local links. Try another word or use the full ISLRTC dictionary above.</p>
+          )}
         </section>
 
         <section className="rounded-2xl border bg-card p-4 space-y-4">
