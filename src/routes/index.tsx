@@ -271,7 +271,7 @@ function Index() {
         </header>
 
         <div className="mode-toggle" role="group" aria-label="Choose sign display mode">
-          <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>3D Avatar (default)</button>
+          <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>3D Avatar (experimental)</button>
           <button className={mode === "hybrid" ? "mode-on" : "mode-off"} onClick={() => setMode("hybrid")}>Official video reference</button>
         </div>
         <div className="avatar-frame">
@@ -302,7 +302,7 @@ function Index() {
                     <span className="font-display text-6xl text-foreground">{cur.big}</span>
                     <p className="font-semibold text-foreground">Look up “{cur.word}” in the official dictionary</p>
                     <p className="max-w-md text-sm text-muted-foreground">No mapped clip is available yet. Search Deaf Enabled Foundation videos and confirm the correct ISL meaning before use.</p>
-                    <a className="chip" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(cur.word)}`} target="_blank" rel="noreferrer">Search official ISLRTC videos ↗</a>
+                    <a className="chip" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(cur.word)}`} target="_blank" rel="noreferrer">Search Deaf Enabled Foundation videos ↗</a>
                     <a className="chip" href="https://def.org.in/def-isl-app/" target="_blank" rel="noreferrer">Explore DEF-ISL reference ↗</a>
                     <a className="chip" href="https://divyangjan.depwd.gov.in/islrtc/" target="_blank" rel="noreferrer">Open official ISL dictionary ↗</a>
                   </div>
@@ -365,7 +365,7 @@ function Index() {
             <p className="text-sm font-semibold text-foreground">Original message (keep this visible)</p>
             <p className="text-lg text-foreground break-words">{text}</p>
             <p className="text-sm text-muted-foreground">This sequence is word-by-word assistance, not a validated ISL sentence. Grammar, negation, questions, names, and context may need a fluent signer.</p>
-            <a className="chip inline-flex" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(text.trim())}`} target="_blank" rel="noreferrer">Search official ISLRTC videos for the whole message ↗</a>
+            <a className="chip inline-flex" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(text.trim())}`} target="_blank" rel="noreferrer">Search Deaf Enabled Foundation videos for the whole message ↗</a>
             <a className="chip inline-flex" href={`https://www.google.com/search?q=${encodeURIComponent(`site:divyangjan.depwd.gov.in/islrtc ${text.trim()}`)}`} target="_blank" rel="noreferrer">Search official dictionary entries for the whole message ↗</a>
             <p className="text-xs text-muted-foreground">If there is no exact sentence result, search important words separately. ISL does not always follow English word order.</p>
             <label className="flex items-center gap-2 text-sm text-foreground font-medium">
@@ -376,7 +376,9 @@ function Index() {
         )}
 
         <section className="space-y-3">
-          <label htmlFor="message-input" className="text-sm font-semibold text-foreground">Your message</label>\n          <textarea id="message-input" className="field" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="For example: Hello, I need help…" aria-describedby="message-help" />\n          <p id="message-help" className="text-sm text-muted-foreground">Type a short message or choose a quick phrase below. Then select Translate to view available references.</p>
+          <label htmlFor="message-input" className="text-sm font-semibold text-foreground">Your message</label>
+          <textarea id="message-input" className="field" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="For example: Hello, I need help…" aria-describedby="message-help" />
+          <p id="message-help" className="text-sm text-muted-foreground">Type a short message or choose a quick phrase below. Then select Translate to view available references.</p>
           {voiceError && <p role="alert" className="text-sm text-destructive">{voiceError}</p>}
           <div className="flex gap-3">
             <button className="btn-primary flex-1" onClick={() => go()} disabled={!text.trim()}>Translate text to sign</button>
