@@ -120,19 +120,31 @@ function Hand({ shapeRef, side }: { shapeRef: React.MutableRefObject<Shape>; sid
 
   useFrame(() => {
     const shape = shapeRef.current;
-    const curlFor = (i: number) =>
-      shape === "fist" ? 1 :
-      shape === "point" ? (i === 0 ? 0 : 1) :
-      shape === "bunch" ? (i === 0 ? 0.32 : 0.7) : 0;
+    // Keep each finger independently articulated. These procedural profiles
+    // improve pose readability, but are not a substitute for motion captured
+    // and ISL-reviewed sign animations.
+    const curlProfiles: Record<Shape, [number, number, number, number]> = {
+      open: [0.02, 0.01, 0.01, 0.03],
+      fist: [0.92, 1.0, 0.96, 0.86],
+      point: [0.02, 0.96, 0.98, 0.9],
+      bunch: [0.38, 0.68, 0.72, 0.58],
+    };
+    const curlFor = (i: number) => curlProfiles[shape][i];
     for (let i = 0; i < 4; i++) {
       const curl = curlFor(i);
       const fan = shape === "open" ? (i - 1.5) * 0.13 : (i - 1.5) * 0.025;
       if (bases.current[i]) {
-        bases.current[i]!.rotation.x = THREE.MathUtils.lerp(bases.current[i]!.rotation.x, -curl * 0.78, 0.18);
+        bases.current[i]!.rotation.x = THREE.MathUtils.lerp(bases.current[i]!.rotation.x, -curl * 0.72, 0.18);
         bases.current[i]!.rotation.z = THREE.MathUtils.lerp(bases.current[i]!.rotation.z, fan, 0.18);
       }
-      if (middle.current[i]) middle.current[i]!.rotation.x = THREE.MathUtils.lerp(middle.current[i]!.rotation.x, -curl * 1.05, 0.18);
-      if (tips.current[i]) tips.current[i]!.rotation.x = THREE.MathUtils.lerp(tips.current[i]!.rotation.x, -curl * 0.78, 0.18);
+      if (middle.current[i]) {
+        const middleCurl = curl * (i === 0 ? 1.12 : i === 3 ? 0.92 : 1.0);
+        middle.current[i]!.rotation.x = THREE.MathUtils.lerp(middle.current[i]!.rotation.x, -middleCurl * 1.02, 0.18);
+      }
+      if (tips.current[i]) {
+        const tipCurl = curl * (i === 1 ? 0.9 : i === 2 ? 0.96 : 1.04);
+        tips.current[i]!.rotation.x = THREE.MathUtils.lerp(tips.current[i]!.rotation.x, -tipCurl * 0.72, 0.18);
+      }
     }
     const thumbCurl = shape === "fist" ? 0.95 : shape === "bunch" ? 0.62 : shape === "point" ? 0.34 : 0;
     if (thumbBase.current) {
