@@ -259,7 +259,9 @@ function Index() {
                   <>
                     <iframe key="isl-alphabet-reference" className="h-full w-full" title="Human ISL alphabet fingerspelling reference"
                       allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
-                      src={`https://www.youtube-nocookie.com/embed/${ISLRTC_ALPHABET_VIDEO}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1`} />
+                      src={`https://www.youtube.com/embed/${ISLRTC_ALPHABET_VIDEO}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1`} />
+                    <a className="absolute top-3 right-3 rounded-full bg-background/95 px-3 py-2 text-xs font-semibold text-foreground shadow"
+                      href={`https://www.youtube.com/watch?v=${ISLRTC_ALPHABET_VIDEO}`} target="_blank" rel="noreferrer">Open alphabet lesson on YouTube ↗</a>
                     <div className="absolute bottom-3 left-3 right-3 rounded-xl bg-background/95 p-3 text-center shadow">
                       <span className="font-display text-4xl text-foreground">{cur.big}</span>
                       <p className="font-semibold text-foreground">Human alphabet reference · spell “{cur.label.replace(/^Spell ["“]|["”] ·.*$/g, "")}”</p>
