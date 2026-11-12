@@ -1,7 +1,7 @@
 /** video = YouTube id of the official ISLRTC dictionary clip (youtube.com/@islrtc) */
 export type Sign = { word: string; emoji: string; how: string; video: string; /** Set true only after an ISL-fluent reviewer validates the matching 3D animation. */ validatedAnimation?: boolean };
 
-export const ISLRTC_ALPHABET_VIDEO = "VdwKSyza5oI";
+export const ISLRTC_ALPHABET_VIDEO = "0emXzSDO61U";
 
 // Approved = has an official ISLRTC dictionary video (youtube.com/@islrtc).
 // Any other word is fingerspelled letter by letter (never guessed).
@@ -179,11 +179,10 @@ export function translate(text: string): Step[] {
     const sign = APPROVED_SIGNS[w] ?? SIGN_ALIASES[w];
     // Only use a word-level sign when it has an official mapped clip or a
     // specifically validated animation. Prototype entries without either
-    // are fingerspelled rather than presented as if they were real ISL signs.
+    // are fingerspelled rather than presented as real ISL signs.
     if (sign && (Boolean(sign.video) || sign.validatedAnimation === true)) {
       steps.push({ kind: "sign", source: w, sign });
     } else {
-      // Human-demonstrated ISL manual alphabet reference is shown for spelling.
       steps.push({ kind: "spell", source: w, letters: w.toUpperCase().split("") });
     }
   }
