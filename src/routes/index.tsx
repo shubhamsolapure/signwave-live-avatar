@@ -116,12 +116,18 @@ const OFFICIAL_ISL_LOOKUPS: Record<string, { label: string; url: string }> = {
   "no": { label: "No", url: "https://www.youtube.com/@deafenabledfoundation/search?query=no" },
 };
 
+// DEF video IDs are mapped only when a specific relevant video was found.
+// Other terms use the DEF channel's search page instead of inventing a video ID.
+const DEF_ISL_VIDEO_LOOKUPS: Record<string, { label: string; video: string }> = {
+  "family": { label: "Draw your family big with ISL · Deaf Enabled Foundation", video: "FQZGP0nSyOI" },
+};
+
 type Frame = { label: string; big: string; how: string; verified: boolean; validatedAnimation: boolean; word: string | null; video: string | null; lookupUrl: string | null };
 
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: s.sign.video || null, lookupUrl: s.sign.video ? null : (OFFICIAL_ISL_LOOKUPS[(s.sign.word || "").toLowerCase()]?.url || "https://divyangjan.depwd.gov.in/islrtc/") }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()]?.video || s.sign.video || null, lookupUrl: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()] || s.sign.video ? null : `https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(s.sign.word)}` }]
       : s.letters.map((l, i) => ({
           label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
           big: l,
