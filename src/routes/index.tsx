@@ -139,7 +139,7 @@ type Frame = { label: string; big: string; how: string; verified: boolean; valid
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()]?.video || s.sign.video || null, lookupUrl: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()] || s.sign.video ? null : `https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(s.sign.word)}` }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: s.sign.video || DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()]?.video || null, lookupUrl: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()] || s.sign.video ? null : `https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(s.sign.word)}` }]
       : DEF_ISL_VIDEO_LOOKUPS[s.source.toLowerCase()]
         ? [{
             label: s.source,
@@ -254,8 +254,8 @@ function Index() {
 
   // Clear badge text based on status
   const badgeText = (() => {
-    if (mode === "hybrid" && cur?.validatedAnimation) return "✅ ISL animation reviewed and validated";
-    if (mode === "hybrid" && cur?.video) return "📹 Reference video · sign match not independently validated";
+    if (mode === "hybrid" && cur?.validatedAnimation) return "ISL animation reviewed and validated";
+    if (mode === "hybrid" && cur?.video) return "Reference video · confirm the sign and context";
     if (mode === "avatar" && cur?.word && cur?.video) return "⚠️ Experimental 3D pose/fingerspelling · NOT validated ISL";
     if (mode === "avatar" && cur?.word) return "⚠️ Experimental 3D pose/fingerspelling · NOT verified ISL";
     return "🔤 Fingerspelling · handshape not validated";
