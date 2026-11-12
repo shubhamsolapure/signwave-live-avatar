@@ -173,6 +173,7 @@ function Index() {
   const [mode, setMode] = useState<"hybrid" | "avatar">("hybrid");
   const [micOk, setMicOk] = useState(true);
   const [voiceError, setVoiceError] = useState("");
+  const [translationNotice, setTranslationNotice] = useState("");
   const [slowPlayback, setSlowPlayback] = useState(false);
   const [phraseQuery, setPhraseQuery] = useState("");
   const [officialQuery, setOfficialQuery] = useState("");
@@ -211,16 +212,29 @@ function Index() {
   useEffect(() => {
     if (!playing) return;
     if (idx >= frames.length - 1) return setPlaying(false);
+    // Keep reference videos on screen until the user chooses Next.
+    if (mode === "hybrid" && frames[idx]?.video && !frames[idx]?.validatedAnimation) {
+      setPlaying(false);
+      return;
+    }
     const t = setTimeout(() => setIdx((i) => i + 1), (frames[idx]?.verified ? (mode === "hybrid" && !frames[idx]?.validatedAnimation ? 5000 : 2200) : 1100) * (slowPlayback ? 1.8 : 1));
     return () => clearTimeout(t);
   }, [playing, idx, frames, mode, slowPlayback]);
 
   const go = (t = text) => {
     setVoiceError("");
+    setTranslationNotice("");
     const f = toFrames(translate(t));
     setFrames(f);
     setIdx(0);
     setPlaying(f.length > 0);
+    if (!t.trim()) {
+      setTranslationNotice("Enter a word or short message to get started.");
+    } else if (f.length === 0) {
+      setTranslationNotice("No words could be processed. Try a short phrase using letters and spaces.");
+    } else if (mode === "hybrid" && f.some((frame) => frame.video)) {
+      setTranslationNotice("Reference videos stay on screen until you select Next, so you have time to watch them.");
+    }
   };
 
   const mic = () => {
@@ -379,6 +393,7 @@ function Index() {
           <label htmlFor="message-input" className="text-sm font-semibold text-foreground">Your message</label>
           <textarea id="message-input" className="field" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="For example: Hello, I need help…" aria-describedby="message-help" />
           <p id="message-help" className="text-sm text-muted-foreground">Type a short message or choose a quick phrase below. Then select Translate to view available references.</p>
+          {translationNotice && <p role="status" aria-live="polite" className="text-sm text-muted-foreground">{translationNotice}</p>}
           {voiceError && <p role="alert" className="text-sm text-destructive">{voiceError}</p>}
           <div className="flex gap-3">
             <button className="btn-primary flex-1" onClick={() => go()} disabled={!text.trim()}>Translate text to sign</button>
