@@ -177,10 +177,12 @@ export function translate(text: string): Step[] {
   // multiple available reference videos instead of collapsing to one sign.
   for (const w of words) {
     const sign = APPROVED_SIGNS[w] ?? SIGN_ALIASES[w];
-    if (sign) {
+    // Only use a word-level sign when it has an official mapped clip or a
+    // specifically validated animation. Prototype entries without either
+    // are fingerspelled rather than presented as real ISL signs.
+    if (sign && (Boolean(sign.video) || sign.validatedAnimation === true)) {
       steps.push({ kind: "sign", source: w, sign });
     } else {
-      // Unknown/function words are fingerspelled; never invent a video ID.
       steps.push({ kind: "spell", source: w, letters: w.toUpperCase().split("") });
     }
   }
