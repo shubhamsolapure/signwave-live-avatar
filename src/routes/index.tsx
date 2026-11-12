@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
+import ISLGloss from "@/components/ISLGloss";
 const Signer3D = lazy(() => import("@/components/Signer3D"));
 import { translate, APPROVED_SIGNS, ISLRTC_ALPHABET_VIDEO, type Step } from "@/lib/isl";
 
@@ -8,9 +9,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "SignWave Live Avatar — Voice & Text to ISL" },
-      { name: "description", content: "Explore official ISL dictionary references and an experimental 3D avatar for typed or spoken input." },
+      { name: "description", content: "Create AI-assisted ISL gloss drafts from messages, match official ISLRTC clips, and flag unsupported signs with SignWave." },
       { property: "og:title", content: "SignWave Live Avatar — Voice & Text to ISL" },
-      { property: "og:description", content: "A prototype for exploring official ISL references and experimental 3D gestures from speech or text." },
+      { property: "og:description", content: "Create AI-assisted ISL gloss drafts, view matched official signer clips, and identify unsupported signs." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -386,6 +387,7 @@ function Index() {
           <div className="flex flex-wrap gap-2">
             {quick.map((q) => <button key={q} className="chip" onClick={() => { setText(q); go(q); }}>{q}</button>)}
           </div>
+          <ISLGloss message={text} />
         </section>
 
         <section className="rounded-2xl border bg-card p-4 space-y-2">
