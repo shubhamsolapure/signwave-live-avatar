@@ -267,7 +267,7 @@ function Index() {
         <header>
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">SignWave Live Avatar · ISL learning prototype</p>
           <h1 className="font-display text-4xl leading-tight text-foreground">Speak or type.<br />See it in sign.</h1>
-          <p className="mt-2 text-muted-foreground">The full-body 3D avatar has a procedural two-hand rig with individually articulated fingers. Its movements are illustrative prototypes, not motion-captured or expert-validated ISL. Official dictionary clips are linked where available; sentence grammar and fingerspelling still need expert review.</p>
+          <p className="mt-2 text-muted-foreground">The full-body 3D avatar has a procedural two-hand rig with individually articulated fingers. Its movements are illustrative prototypes, not motion-captured or expert-validated ISL. Reference videos are shown where mapped. Word-by-word output is a learning aid, not a validated sentence-level ISL translation.</p>
         </header>
 
         <div className="mode-toggle" role="group" aria-label="Choose sign display mode">
@@ -309,7 +309,7 @@ function Index() {
                 )}
               </div>
             ) : (
-              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Select a message to explore a dictionary clip or an illustrative 3D gesture</div>
+              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Select a message to explore a reference video or an experimental 3D gesture</div>
             )
           ) : (
           <ClientOnly fallback={null}>
@@ -344,7 +344,7 @@ function Index() {
               {(mode === "avatar" || !cur.video) && <p className="text-muted-foreground">{cur.how}</p>}
               {cur.lookupUrl && (
                 <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">
-                  "Search Deaf Enabled Foundation videos ↗"
+                  Search Deaf Enabled Foundation videos ↗
                 </a>
               )}
               <div className="flex w-full items-center gap-2 pt-2">
@@ -366,7 +366,7 @@ function Index() {
             <p className="text-lg text-foreground break-words">{text}</p>
             <p className="text-sm text-muted-foreground">This sequence is word-by-word assistance, not a validated ISL sentence. Grammar, negation, questions, names, and context may need a fluent signer.</p>
             <a className="chip inline-flex" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(text.trim())}`} target="_blank" rel="noreferrer">Search Deaf Enabled Foundation videos for the whole message ↗</a>
-            <a className="chip inline-flex" href={`https://www.google.com/search?q=${encodeURIComponent(`site:divyangjan.depwd.gov.in/islrtc ${text.trim()}`)}`} target="_blank" rel="noreferrer">Search official dictionary entries for the whole message ↗</a>
+            <a className="chip inline-flex" href={`https://www.google.com/search?q=${encodeURIComponent(`site:divyangjan.depwd.gov.in/islrtc ${text.trim()}`)}`} target="_blank" rel="noreferrer">Search ISLRTC dictionary entries for the whole message ↗</a>
             <p className="text-xs text-muted-foreground">If there is no exact sentence result, search important words separately. ISL does not always follow English word order.</p>
             <label className="flex items-center gap-2 text-sm text-foreground font-medium">
               <input type="checkbox" checked={slowPlayback} onChange={(e) => setSlowPlayback(e.target.checked)} />
