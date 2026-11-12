@@ -211,7 +211,7 @@ function Index() {
   useEffect(() => {
     if (!playing) return;
     if (idx >= frames.length - 1) return setPlaying(false);
-    const t = setTimeout(() => setIdx((i) => i + 1), (frames[idx]?.verified ? (mode === "hybrid" && !frames[idx]?.validatedAnimation ? 5000 : 2200) : 1100) * (slowPlayback ? 1.8 : 1));
+    const t = setTimeout(() => setIdx((i) => i + 1), (frames[idx]?.verified ? (mode === "hybrid" && !frames[idx]?.validatedAnimation ? 5000 : 2200) : (mode === "hybrid" ? 2200 : 1100)) * (slowPlayback ? 1.8 : 1));
     return () => clearTimeout(t);
   }, [playing, idx, frames, mode, slowPlayback]);
 
@@ -256,6 +256,7 @@ function Index() {
   const badgeText = (() => {
     if (mode === "hybrid" && cur?.validatedAnimation) return "ISL animation reviewed and validated";
     if (mode === "hybrid" && cur?.video) return "Reference video · confirm the sign and context";
+    if (mode === "hybrid" && !cur?.word && cur?.big) return "Fingerspelling · alphabet reference";
     if (mode === "avatar" && cur?.word && cur?.video) return "⚠️ Experimental 3D pose/fingerspelling · NOT validated ISL";
     if (mode === "avatar" && cur?.word) return "⚠️ Experimental 3D pose/fingerspelling · NOT verified ISL";
     return "🔤 Fingerspelling · handshape not validated";
