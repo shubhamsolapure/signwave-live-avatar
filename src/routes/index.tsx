@@ -45,75 +45,81 @@ const OFFICIAL_ISL_LOOKUPS: Record<string, { label: string; url: string }> = {
   "air pollution": { label: "Air pollution", url: "https://divyangjan.depwd.gov.in/islrtc/search.php?id=113&search=Air+Pollution&type=list" },
 
   // Expanded official-video discovery catalog. These are search links, not pre-verified individual clips.
-  "you": { label: "You", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=you" },
-  "water": { label: "Water", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=water" },
-  "food": { label: "Food", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=food" },
-  "eat": { label: "Eat", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=eat" },
-  "drink": { label: "Drink", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=drink" },
-  "father": { label: "Father", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=father" },
-  "family": { label: "Family", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=family" },
-  "friend": { label: "Friend", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=friend" },
-  "school": { label: "School", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=school" },
-  "teacher": { label: "Teacher", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=teacher" },
-  "student": { label: "Student", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=student" },
-  "book": { label: "Book", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=book" },
-  "bus": { label: "Bus", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=bus" },
-  "train": { label: "Train", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=train" },
-  "toilet": { label: "Toilet", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=toilet" },
-  "bathroom": { label: "Bathroom", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=bathroom" },
-  "tomorrow": { label: "Tomorrow", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=tomorrow" },
-  "yesterday": { label: "Yesterday", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=yesterday" },
-  "today": { label: "Today", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=today" },
-  "now": { label: "Now", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=now" },
-  "later": { label: "Later", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=later" },
-  "time": { label: "Time", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=time" },
-  "day": { label: "Day", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=day" },
-  "hungry": { label: "Hungry", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=hungry" },
-  "thirsty": { label: "Thirsty", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=thirsty" },
-  "tired": { label: "Tired", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=tired" },
-  "sick": { label: "Sick", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=sick" },
-  "fine": { label: "Fine", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=fine" },
-  "okay": { label: "Okay", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=okay" },
-  "see": { label: "See", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=see" },
-  "look": { label: "Look", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=look" },
-  "hear": { label: "Hear", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=hear" },
-  "speak": { label: "Speak", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=speak" },
-  "talk": { label: "Talk", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=talk" },
-  "know": { label: "Know", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=know" },
-  "think": { label: "Think", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=think" },
-  "feel": { label: "Feel", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=feel" },
-  "like": { label: "Like", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=like" },
-  "love": { label: "Love", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=love" },
-  "happy": { label: "Happy", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=happy" },
-  "sad": { label: "Sad", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=sad" },
-  "angry": { label: "Angry", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=angry" },
-  "afraid": { label: "Afraid", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=afraid" },
-  "cold": { label: "Cold", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=cold" },
-  "hot": { label: "Hot", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=hot" },
-  "rain": { label: "Rain", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=rain" },
-  "sun": { label: "Sun", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=sun" },
-  "work": { label: "Work", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=work" },
-  "play": { label: "Play", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=play" },
-  "open": { label: "Open", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=open" },
-  "close": { label: "Close", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=close" },
-  "sit": { label: "Sit", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=sit" },
-  "stand": { label: "Stand", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=stand" },
-  "money": { label: "Money", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=money" },
-  "police": { label: "Police", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=police" },
-  "emergency": { label: "Emergency", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=emergency" },
-  "call": { label: "Call", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=call" },
-  "phone": { label: "Phone", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=phone" },
-  "finished": { label: "Finished", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=finished" },
-  "learn": { label: "Learn", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=learn" },
-  "again": { label: "Again", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=again" },
-  "safe": { label: "Safe", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=safe" },
-  "danger": { label: "Danger", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=danger" },
-  "goodbye": { label: "Goodbye", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=goodbye" },
-  "welcome": { label: "Welcome", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=welcome" },
-  "sorry": { label: "Sorry", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=sorry" },
-  "please": { label: "Please", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=please" },
-  "yes": { label: "Yes", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=yes" },
-  "no": { label: "No", url: "https://www.youtube.com/@islrtcnewdelhi4069/search?query=no" },
+  "you": { label: "You", url: "https://www.youtube.com/@deafenabledfoundation/search?query=you" },
+  "water": { label: "Water", url: "https://www.youtube.com/@deafenabledfoundation/search?query=water" },
+  "food": { label: "Food", url: "https://www.youtube.com/@deafenabledfoundation/search?query=food" },
+  "eat": { label: "Eat", url: "https://www.youtube.com/@deafenabledfoundation/search?query=eat" },
+  "drink": { label: "Drink", url: "https://www.youtube.com/@deafenabledfoundation/search?query=drink" },
+  "father": { label: "Father", url: "https://www.youtube.com/@deafenabledfoundation/search?query=father" },
+  "family": { label: "Family", url: "https://www.youtube.com/@deafenabledfoundation/search?query=family" },
+  "friend": { label: "Friend", url: "https://www.youtube.com/@deafenabledfoundation/search?query=friend" },
+  "school": { label: "School", url: "https://www.youtube.com/@deafenabledfoundation/search?query=school" },
+  "teacher": { label: "Teacher", url: "https://www.youtube.com/@deafenabledfoundation/search?query=teacher" },
+  "student": { label: "Student", url: "https://www.youtube.com/@deafenabledfoundation/search?query=student" },
+  "book": { label: "Book", url: "https://www.youtube.com/@deafenabledfoundation/search?query=book" },
+  "bus": { label: "Bus", url: "https://www.youtube.com/@deafenabledfoundation/search?query=bus" },
+  "train": { label: "Train", url: "https://www.youtube.com/@deafenabledfoundation/search?query=train" },
+  "toilet": { label: "Toilet", url: "https://www.youtube.com/@deafenabledfoundation/search?query=toilet" },
+  "bathroom": { label: "Bathroom", url: "https://www.youtube.com/@deafenabledfoundation/search?query=bathroom" },
+  "tomorrow": { label: "Tomorrow", url: "https://www.youtube.com/@deafenabledfoundation/search?query=tomorrow" },
+  "yesterday": { label: "Yesterday", url: "https://www.youtube.com/@deafenabledfoundation/search?query=yesterday" },
+  "today": { label: "Today", url: "https://www.youtube.com/@deafenabledfoundation/search?query=today" },
+  "now": { label: "Now", url: "https://www.youtube.com/@deafenabledfoundation/search?query=now" },
+  "later": { label: "Later", url: "https://www.youtube.com/@deafenabledfoundation/search?query=later" },
+  "time": { label: "Time", url: "https://www.youtube.com/@deafenabledfoundation/search?query=time" },
+  "day": { label: "Day", url: "https://www.youtube.com/@deafenabledfoundation/search?query=day" },
+  "hungry": { label: "Hungry", url: "https://www.youtube.com/@deafenabledfoundation/search?query=hungry" },
+  "thirsty": { label: "Thirsty", url: "https://www.youtube.com/@deafenabledfoundation/search?query=thirsty" },
+  "tired": { label: "Tired", url: "https://www.youtube.com/@deafenabledfoundation/search?query=tired" },
+  "sick": { label: "Sick", url: "https://www.youtube.com/@deafenabledfoundation/search?query=sick" },
+  "fine": { label: "Fine", url: "https://www.youtube.com/@deafenabledfoundation/search?query=fine" },
+  "okay": { label: "Okay", url: "https://www.youtube.com/@deafenabledfoundation/search?query=okay" },
+  "see": { label: "See", url: "https://www.youtube.com/@deafenabledfoundation/search?query=see" },
+  "look": { label: "Look", url: "https://www.youtube.com/@deafenabledfoundation/search?query=look" },
+  "hear": { label: "Hear", url: "https://www.youtube.com/@deafenabledfoundation/search?query=hear" },
+  "speak": { label: "Speak", url: "https://www.youtube.com/@deafenabledfoundation/search?query=speak" },
+  "talk": { label: "Talk", url: "https://www.youtube.com/@deafenabledfoundation/search?query=talk" },
+  "know": { label: "Know", url: "https://www.youtube.com/@deafenabledfoundation/search?query=know" },
+  "think": { label: "Think", url: "https://www.youtube.com/@deafenabledfoundation/search?query=think" },
+  "feel": { label: "Feel", url: "https://www.youtube.com/@deafenabledfoundation/search?query=feel" },
+  "like": { label: "Like", url: "https://www.youtube.com/@deafenabledfoundation/search?query=like" },
+  "love": { label: "Love", url: "https://www.youtube.com/@deafenabledfoundation/search?query=love" },
+  "happy": { label: "Happy", url: "https://www.youtube.com/@deafenabledfoundation/search?query=happy" },
+  "sad": { label: "Sad", url: "https://www.youtube.com/@deafenabledfoundation/search?query=sad" },
+  "angry": { label: "Angry", url: "https://www.youtube.com/@deafenabledfoundation/search?query=angry" },
+  "afraid": { label: "Afraid", url: "https://www.youtube.com/@deafenabledfoundation/search?query=afraid" },
+  "cold": { label: "Cold", url: "https://www.youtube.com/@deafenabledfoundation/search?query=cold" },
+  "hot": { label: "Hot", url: "https://www.youtube.com/@deafenabledfoundation/search?query=hot" },
+  "rain": { label: "Rain", url: "https://www.youtube.com/@deafenabledfoundation/search?query=rain" },
+  "sun": { label: "Sun", url: "https://www.youtube.com/@deafenabledfoundation/search?query=sun" },
+  "work": { label: "Work", url: "https://www.youtube.com/@deafenabledfoundation/search?query=work" },
+  "play": { label: "Play", url: "https://www.youtube.com/@deafenabledfoundation/search?query=play" },
+  "open": { label: "Open", url: "https://www.youtube.com/@deafenabledfoundation/search?query=open" },
+  "close": { label: "Close", url: "https://www.youtube.com/@deafenabledfoundation/search?query=close" },
+  "sit": { label: "Sit", url: "https://www.youtube.com/@deafenabledfoundation/search?query=sit" },
+  "stand": { label: "Stand", url: "https://www.youtube.com/@deafenabledfoundation/search?query=stand" },
+  "money": { label: "Money", url: "https://www.youtube.com/@deafenabledfoundation/search?query=money" },
+  "police": { label: "Police", url: "https://www.youtube.com/@deafenabledfoundation/search?query=police" },
+  "emergency": { label: "Emergency", url: "https://www.youtube.com/@deafenabledfoundation/search?query=emergency" },
+  "call": { label: "Call", url: "https://www.youtube.com/@deafenabledfoundation/search?query=call" },
+  "phone": { label: "Phone", url: "https://www.youtube.com/@deafenabledfoundation/search?query=phone" },
+  "finished": { label: "Finished", url: "https://www.youtube.com/@deafenabledfoundation/search?query=finished" },
+  "learn": { label: "Learn", url: "https://www.youtube.com/@deafenabledfoundation/search?query=learn" },
+  "again": { label: "Again", url: "https://www.youtube.com/@deafenabledfoundation/search?query=again" },
+  "safe": { label: "Safe", url: "https://www.youtube.com/@deafenabledfoundation/search?query=safe" },
+  "danger": { label: "Danger", url: "https://www.youtube.com/@deafenabledfoundation/search?query=danger" },
+  "goodbye": { label: "Goodbye", url: "https://www.youtube.com/@deafenabledfoundation/search?query=goodbye" },
+  "welcome": { label: "Welcome", url: "https://www.youtube.com/@deafenabledfoundation/search?query=welcome" },
+  "sorry": { label: "Sorry", url: "https://www.youtube.com/@deafenabledfoundation/search?query=sorry" },
+  "please": { label: "Please", url: "https://www.youtube.com/@deafenabledfoundation/search?query=please" },
+  "yes": { label: "Yes", url: "https://www.youtube.com/@deafenabledfoundation/search?query=yes" },
+  "no": { label: "No", url: "https://www.youtube.com/@deafenabledfoundation/search?query=no" },
+};
+
+// DEF video IDs are mapped only when a specific relevant video was found.
+// Other terms use the DEF channel's search page instead of inventing a video ID.
+const DEF_ISL_VIDEO_LOOKUPS: Record<string, { label: string; video: string }> = {
+  "family": { label: "Draw your family big with ISL · Deaf Enabled Foundation", video: "FQZGP0nSyOI" },
 };
 
 type Frame = { label: string; big: string; how: string; verified: boolean; validatedAnimation: boolean; word: string | null; video: string | null; lookupUrl: string | null };
@@ -121,7 +127,7 @@ type Frame = { label: string; big: string; how: string; verified: boolean; valid
 function toFrames(steps: Step[]): Frame[] {
   return steps.flatMap((s): Frame[] =>
     s.kind === "sign"
-      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: s.sign.video || null, lookupUrl: s.sign.video ? null : (OFFICIAL_ISL_LOOKUPS[(s.sign.word || "").toLowerCase()]?.url || "https://divyangjan.depwd.gov.in/islrtc/") }]
+      ? [{ label: s.sign.word, big: s.sign.emoji, how: s.sign.how, verified: Boolean(s.sign.video), validatedAnimation: s.sign.validatedAnimation === true, word: s.sign.word, video: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()]?.video || s.sign.video || null, lookupUrl: DEF_ISL_VIDEO_LOOKUPS[(s.sign.word || "").toLowerCase()] || s.sign.video ? null : `https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(s.sign.word)}` }]
       : s.letters.map((l, i) => ({
           label: `Spell "${s.source}" · ${i + 1}/${s.letters.length}`,
           big: l,
@@ -130,7 +136,7 @@ function toFrames(steps: Step[]): Frame[] {
           validatedAnimation: false,
           word: null,
           video: null,
-          lookupUrl: `https://www.youtube.com/@islrtcnewdelhi4069/search?query=${encodeURIComponent(s.source)}`,
+          lookupUrl: `https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(s.source)}`,
         })),
   );
 }
@@ -272,8 +278,9 @@ function Index() {
                   <div className="flex h-full flex-col items-center justify-center gap-3 p-4 text-center">
                     <span className="font-display text-6xl text-foreground">{cur.big}</span>
                     <p className="font-semibold text-foreground">Look up “{cur.word}” in the official dictionary</p>
-                    <p className="max-w-md text-sm text-muted-foreground">No mapped clip is available yet. Search the official ISLRTC collection and confirm the correct meaning before use.</p>
-                    <a className="chip" href={`https://www.youtube.com/@islrtcnewdelhi4069/search?query=${encodeURIComponent(cur.word)}`} target="_blank" rel="noreferrer">Search official ISLRTC videos ↗</a>
+                    <p className="max-w-md text-sm text-muted-foreground">No mapped clip is available yet. Search Deaf Enabled Foundation videos and confirm the correct ISL meaning before use.</p>
+                    <a className="chip" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(cur.word)}`} target="_blank" rel="noreferrer">Search official ISLRTC videos ↗</a>
+                    <a className="chip" href="https://def.org.in/def-isl-app/" target="_blank" rel="noreferrer">Explore DEF-ISL reference ↗</a>
                     <a className="chip" href="https://divyangjan.depwd.gov.in/islrtc/" target="_blank" rel="noreferrer">Open official ISL dictionary ↗</a>
                   </div>
                 )}
@@ -314,7 +321,7 @@ function Index() {
               {(mode === "avatar" || !cur.video) && <p className="text-muted-foreground">{cur.how}</p>}
               {cur.lookupUrl && (
                 <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">
-                  "Search official ISLRTC videos for this word ↗"
+                  "Search Deaf Enabled Foundation videos ↗"
                 </a>
               )}
               <div className="flex w-full items-center gap-2 pt-2">
@@ -335,7 +342,7 @@ function Index() {
             <p className="text-sm font-semibold text-foreground">Original message (keep this visible)</p>
             <p className="text-lg text-foreground break-words">{text}</p>
             <p className="text-sm text-muted-foreground">This sequence is word-by-word assistance, not a validated ISL sentence. Grammar, negation, questions, names, and context may need a fluent signer.</p>
-            <a className="chip inline-flex" href={`https://www.youtube.com/@islrtcnewdelhi4069/search?query=${encodeURIComponent(text.trim())}`} target="_blank" rel="noreferrer">Search official ISLRTC videos for the whole message ↗</a>
+            <a className="chip inline-flex" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(text.trim())}`} target="_blank" rel="noreferrer">Search official ISLRTC videos for the whole message ↗</a>
             <a className="chip inline-flex" href={`https://www.google.com/search?q=${encodeURIComponent(`site:divyangjan.depwd.gov.in/islrtc ${text.trim()}`)}`} target="_blank" rel="noreferrer">Search official dictionary entries for the whole message ↗</a>
             <p className="text-xs text-muted-foreground">If there is no exact sentence result, search important words separately. ISL does not always follow English word order.</p>
             <label className="flex items-center gap-2 text-sm text-foreground font-medium">
