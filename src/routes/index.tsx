@@ -256,23 +256,26 @@ function Index() {
               </div>
             ) : cur ? (
               <div className="relative h-full w-full">
-                {!cur.word && (
-                  <iframe key="isl-alphabet-reference" className="h-full w-full" title="Human ISL alphabet fingerspelling reference"
-                    allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
-                    src={`https://www.youtube-nocookie.com/embed/${ISLRTC_ALPHABET_VIDEO}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1`} />
+                {!cur.word ? (
+                  <>
+                    <iframe key="isl-alphabet-reference" className="h-full w-full" title="Human ISL alphabet fingerspelling reference"
+                      allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
+                      src={`https://www.youtube-nocookie.com/embed/${ISLRTC_ALPHABET_VIDEO}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1`} />
+                    <div className="absolute bottom-3 left-3 right-3 rounded-xl bg-background/95 p-3 text-center shadow">
+                      <span className="font-display text-4xl text-foreground">{cur.big}</span>
+                      <p className="font-semibold text-foreground">Human alphabet reference · spell “{cur.label.replace(/^Spell ["“]|["”] ·.*$/g, "")}”</p>
+                      <p className="text-sm text-muted-foreground">The letter shown is part of fingerspelling, not a word-level sign.</p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center gap-3 p-4 text-center">
+                    <span className="font-display text-6xl text-foreground">{cur.big}</span>
+                    <p className="font-semibold text-foreground">Look up “{cur.word}” in the official dictionary</p>
+                    <p className="max-w-md text-sm text-muted-foreground">No mapped clip is available yet. Search the official ISLRTC collection and confirm the correct meaning before use.</p>
+                    <a className="chip" href={`https://www.youtube.com/@islrtcnewdelhi4069/search?query=${encodeURIComponent(cur.word)}`} target="_blank" rel="noreferrer">Search official ISLRTC videos ↗</a>
+                    <a className="chip" href="https://divyangjan.depwd.gov.in/islrtc/" target="_blank" rel="noreferrer">Open official ISL dictionary ↗</a>
+                  </div>
                 )}
-                <div className="absolute bottom-3 left-3 right-3 rounded-xl bg-background/95 p-3 text-center shadow">
-                  <span className="font-display text-4xl text-foreground">{cur.big}</span>
-                  <p className="font-semibold text-foreground">{!cur.word ? `Human alphabet reference · spell “${cur.label.replace(/^Spell ["“]|["”] ·.*$/g, "")}”` : `Look up “${cur.word}” in the official dictionary`}</p>
-                <p className="max-w-md text-sm text-muted-foreground">This word does not have a locally mapped clip in SignWave yet. Open the official ISLRTC dictionary entry when available, or search the official collection. Check the meaning and any regional or alternate sign before using it.</p>
-                <form className="flex w-full max-w-md gap-2" onSubmit={(e) => { e.preventDefault(); const term = (officialQuery.trim() || cur.word || cur.label).replace(/^Spell ["“]|["”] ·.*$/g, "").trim(); if (term) window.open(`https://www.youtube.com/@islrtcnewdelhi4069/search?query=${encodeURIComponent(term)}`, "_blank", "noopener,noreferrer"); }}>
-                  <input className="field min-w-0 flex-1" value={officialQuery} onChange={(e) => setOfficialQuery(e.target.value)} aria-label="Search official ISLRTC sign videos" placeholder={cur.word || cur.label || "Search a word or phrase…"} />
-                  <button className="btn-primary" type="submit">Find videos ↗</button>
-                </form>
-                <a className="chip" href={`https://www.youtube.com/@islrtcnewdelhi4069/search?query=${encodeURIComponent(cur.word || cur.label)}`} target="_blank" rel="noreferrer">Search this word in ISLRTC videos ↗</a>
-                <a className="chip" href={`https://www.google.com/search?q=${encodeURIComponent(`site:divyangjan.depwd.gov.in/islrtc ${cur.word || cur.label}`)}`} target="_blank" rel="noreferrer">Search official dictionary entries for this word ↗</a>
-                <a className="chip" href="https://divyangjan.depwd.gov.in/islrtc/" target="_blank" rel="noreferrer">Open official dictionary website ↗</a>
-                <p className="max-w-md text-xs text-muted-foreground">Search opens results on the ISLRTC YouTube channel. Choose the relevant meaning and check that the video is from ISLRTC; a word may have several signs. External search results cannot be guaranteed or embedded automatically.</p>
               </div>
             ) : (
               <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Select a message to explore a dictionary clip or an illustrative 3D gesture</div>
