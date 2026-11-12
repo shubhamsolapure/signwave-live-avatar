@@ -262,14 +262,14 @@ function Index() {
 
   return (
     <main className="min-h-screen bg-background px-4 py-8">
-      <div className="mx-auto max-w-xl space-y-6">
+      <div className="app-shell mx-auto space-y-6">
         <header>
-          <p className="text-sm font-semibold uppercase tracking-widest text-primary">SignWave Live Avatar</p>
+          <p className="text-sm font-semibold uppercase tracking-widest text-primary">SignWave Live Avatar · ISL learning prototype</p>
           <h1 className="font-display text-4xl leading-tight text-foreground">Speak or type.<br />See it in sign.</h1>
           <p className="mt-2 text-muted-foreground">The full-body 3D avatar has a procedural two-hand rig with individually articulated fingers. Its movements are illustrative prototypes, not motion-captured or expert-validated ISL. Official dictionary clips are linked where available; sentence grammar and fingerspelling still need expert review.</p>
         </header>
 
-        <div className="mode-toggle" role="tablist">
+        <div className="mode-toggle" role="group" aria-label="Choose sign display mode">
           <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>3D Avatar (default)</button>
           <button className={mode === "hybrid" ? "mode-on" : "mode-off"} onClick={() => setMode("hybrid")}>Official video reference</button>
         </div>
@@ -375,11 +375,11 @@ function Index() {
         )}
 
         <section className="space-y-3">
-          <textarea className="field" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="Type a message…" />
+          <label htmlFor="message-input" className="text-sm font-semibold text-foreground">Your message</label>\n          <textarea id="message-input" className="field" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="For example: Hello, I need help…" aria-describedby="message-help" />\n          <p id="message-help" className="text-sm text-muted-foreground">Type a short message or choose a quick phrase below. Then select Translate to view available references.</p>
           {voiceError && <p role="alert" className="text-sm text-destructive">{voiceError}</p>}
           <div className="flex gap-3">
             <button className="btn-primary flex-1" onClick={() => go()} disabled={!text.trim()}>Translate text to sign</button>
-            <button className={listening ? "btn-mic btn-mic-on" : "btn-mic"} onClick={mic} disabled={!micOk} aria-label="Speak">{listening ? "■" : "🎤"}</button>
+            <button className={listening ? "btn-mic btn-mic-on" : "btn-mic"} onClick={mic} disabled={!micOk} aria-label={listening ? "Stop voice input" : "Start voice input"} title={listening ? "Stop voice input" : "Start voice input"}>{listening ? "■" : "🎤"}</button>
           </div>
           {!micOk && <p className="text-sm text-muted-foreground">Voice input is not supported in this browser. Try Chrome or type your message instead.</p>}
           {micOk && <p className="text-xs text-muted-foreground">Voice recognition uses your browser speech service (English–India). Microphone permission and an internet connection may be required.</p>}
