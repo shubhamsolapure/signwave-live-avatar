@@ -14,7 +14,7 @@ describe("translate", () => {
     expect(translate("thank you").length).toBe(1);
   });
   it("fingerspells words with no dictionary entry", () => {
-    expect(translate("you")[0]?.kind).toBe("spell");
+    expect(translate("zzqx")[0]?.kind).toBe("spell");
   });
   it("resolves common English aliases to existing dictionary clips", () => {
     expect(translate("hey")[0]).toMatchObject({ kind: "sign", sign: { word: "Hi" } });

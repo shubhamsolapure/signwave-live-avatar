@@ -1,6 +1,20 @@
 /** video = YouTube id of the official ISLRTC dictionary clip (youtube.com/@islrtc) */
 export type Sign = { word: string; emoji: string; how: string; video: string; /** Set true only after an ISL-fluent reviewer validates the matching 3D animation. */ validatedAnimation?: boolean };
 
+import ISLRTC_DICTIONARY from "./islrtc-dictionary.json";
+
+/** Word → official ISLRTC clip id, harvested from exact single-word video titles on youtube.com/@islrtc. */
+export const ISLRTC_WORD_VIDEOS: Record<string, string> = ISLRTC_DICTIONARY;
+
+/** Official sign for a word: curated entry first, then the ISLRTC title index. */
+export function lookupSign(w: string): Sign | undefined {
+  const s = APPROVED_SIGNS[w] ?? SIGN_ALIASES[w];
+  if (s && (s.video || s.validatedAnimation === true)) return s;
+  const v = ISLRTC_WORD_VIDEOS[w];
+  if (v) return { word: w.charAt(0).toUpperCase() + w.slice(1), emoji: "🤟", how: "Watch the official ISLRTC clip.", video: v };
+  return undefined;
+}
+
 export const ISLRTC_ALPHABET_VIDEO = "0emXzSDO61U";
 
 // Approved = has an official ISLRTC dictionary video (youtube.com/@islrtc).
@@ -176,11 +190,9 @@ export function translate(text: string): Step[] {
   // Queue one clip per mapped word so phrase-library selections can show
   // multiple available reference videos instead of collapsing to one sign.
   for (const w of words) {
-    const sign = APPROVED_SIGNS[w] ?? SIGN_ALIASES[w];
-    // Only use a word-level sign when it has an official mapped clip or a
-    // specifically validated animation. Prototype entries without either
-    // are fingerspelled rather than presented as real ISL signs.
-    if (sign && (Boolean(sign.video) || sign.validatedAnimation === true)) {
+    // Official clip or validated animation only; otherwise fingerspell.
+    const sign = lookupSign(w);
+    if (sign) {
       steps.push({ kind: "sign", source: w, sign });
     } else {
       steps.push({ kind: "spell", source: w, letters: w.toUpperCase().split("") });

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { APPROVED_SIGNS } from "./isl";
+import { APPROVED_SIGNS, lookupSign } from "./isl";
 
 export const glossInputSchema = z.object({ message: z.string().trim().min(1).max(1000) });
 export const glossSchema = z.object({
@@ -21,7 +21,7 @@ export function matchGloss(tokens: string[]): GlossClip[] {
   return tokens.map((token) => {
     const gloss = token.trim().toUpperCase();
     const key = gloss.toLowerCase();
-    const sign = APPROVED_SIGNS[key === "thank-you" || key === "thank you" ? "thank" : key];
+    const sign = lookupSign(key === "thank-you" || key === "thank you" ? "thank" : key);
     const video = sign && /^[A-Za-z0-9_-]{11}$/.test(sign.video) ? sign.video : null;
     return { gloss, video, letters: video ? [] : gloss.replace(/[^A-Z0-9]/g, "").split("") };
   });
