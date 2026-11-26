@@ -56,6 +56,19 @@ The interface includes a searchable library of 60 everyday practice messages cov
 **Accuracy boundary:** Do not present the procedural avatar's approximate gestures or word-by-word phrase playback as validated ISL. The next major step is to source and license additional ISLRTC dictionary/phrase clips, then have Deaf ISL reviewers verify each sign and sentence-level translation. Preserve the original text caption while testing.
 
 
+## Expanded dictionary fallback update
+
+The `feature/expanded-isl-video-library` branch improves the unsupported-word path in the hybrid player:
+
+- When an exact ISLRTC entry is already catalogued in the app, the fingerspelling fallback now links directly to that Government of India dictionary entry.
+- For other unsupported words, the fallback opens the official ISLRTC dictionary home/search page rather than implying that a third-party search result is an approved sign.
+- The player continues to distinguish a locally mapped reference clip from a validated avatar animation. No extra word is counted as a local verified video solely because an external dictionary page exists.
+- The original message and the word-by-word limitation remain visible.
+
+ISLRTC describes its dictionary as a video dictionary with English/Hindi equivalents, synonyms and context-dependent variants. The centre also states that dictionary material may be used for research, teaching and technology development provided it is not resold or used for profiteering and proper acknowledgement is given. Before bundling any downloaded video files, check the current source terms and retain attribution.
+
+Official source: https://divyangjan.depwd.gov.in/islrtc/
+
 ## Additional official dictionary references
 
 The app now links 24 individually identified entries on the Government of India's ISLRTC dictionary site, including accident, pain, airport, allergy, ambulance, medicine, milk, morning, mother, market, and metro. Unsupported words that match this lookup list show a direct official-entry link alongside the fingerspelling fallback.
