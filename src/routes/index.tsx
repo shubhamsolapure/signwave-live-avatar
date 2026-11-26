@@ -317,7 +317,7 @@ function Index() {
                     <span className="font-display text-6xl text-foreground">{cur.big}</span>
                     <p className="font-semibold text-foreground">Look up “{cur.word}” in the official dictionary</p>
                     <p className="max-w-md text-sm text-muted-foreground">No locally mapped video clip is available yet. Open the official ISLRTC dictionary entry, then add a clip only after its exact meaning and usage are checked.</p>
-                    {cur.lookupUrl && <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">Open official ISLRTC reference for “{cur.word}” ↗</a>}
+                    {cur.lookupUrl && <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">{cur.lookupUrl.endsWith("/islrtc/") ? "Search the official ISLRTC dictionary ↗" : `Open official ISLRTC entry for “${cur.word}” ↗`}</a>}
                     <a className="chip" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(cur.word)}`} target="_blank" rel="noreferrer">Explore additional signer references ↗</a>
                     <a className="chip" href="https://def.org.in/def-isl-app/" target="_blank" rel="noreferrer">Explore DEF-ISL reference ↗</a>
                   </div>
@@ -359,7 +359,7 @@ function Index() {
               {(mode === "avatar" || !cur.video) && <p className="text-muted-foreground">{cur.how}</p>}
               {cur.lookupUrl && (
                 <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">
-                  {cur.lookupUrl.includes("divyangjan.depwd.gov.in") ? "Open official ISLRTC dictionary entry ↗" : "Search Deaf Enabled Foundation videos ↗"}
+                  {cur.lookupUrl.endsWith("/islrtc/") ? "Search official ISLRTC dictionary ↗" : "Open official ISLRTC dictionary entry ↗"}
                 </a>
               )}
               <div className="flex w-full items-center gap-2 pt-2">
