@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, Lightformer, ContactShadows } from "@react-three/drei";
+import { Environment, Lightformer, ContactShadows, RoundedBox } from "@react-three/drei";
 import { useRef } from "react";
 import * as THREE from "three";
 
@@ -151,11 +151,12 @@ function Hand({ shapeRef, side }: { shapeRef: React.MutableRefObject<Shape>; sid
   return (
     <group position={[0, -0.05, 0]}>
       {/* Palm and subtle wrist crease */}
-      <mesh castShadow><boxGeometry args={[0.078, 0.085, 0.032]} /><meshStandardMaterial color={SKIN} roughness={0.58} /></mesh>
-      <mesh position={[0, -0.018, 0.017]}><boxGeometry args={[0.052, 0.002, 0.002]} /><meshStandardMaterial color="#a96e50" roughness={0.8} /></mesh>
+      <RoundedBox args={[0.082, 0.096, 0.038]} radius={0.018} smoothness={4} castShadow><meshPhysicalMaterial color={SKIN} roughness={0.48} clearcoat={0.12} clearcoatRoughness={0.72} /></RoundedBox>
+      <mesh position={[0, -0.012, 0.020]}><boxGeometry args={[0.052, 0.0018, 0.002]} /><meshStandardMaterial color="#a96e50" roughness={0.82} /></mesh>
+      {[-0.018, 0, 0.018].map((x) => <mesh key={x} position={[x, -0.039, 0.020]}><sphereGeometry args={[0.006, 10, 8]} /><meshStandardMaterial color="#b87959" roughness={0.72} /></mesh>)}
       {[0, 1, 2, 3].map((i) => (
         <group key={i} position={[(-0.028 + i * 0.019), -0.047, 0.001]} ref={(g) => { if (g) bases.current[i] = g; }}>
-          <mesh position={[0, -0.022, 0]} castShadow><capsuleGeometry args={[0.0085, 0.035, 5, 10]} /><meshStandardMaterial color={SKIN} roughness={0.58} /></mesh>
+          <mesh position={[0, -0.022, 0]} castShadow><capsuleGeometry args={[0.0085, 0.035, 5, 10]} /><meshPhysicalMaterial color={SKIN} roughness={0.48} clearcoat={0.1} clearcoatRoughness={0.75} /></mesh>
           <group position={[0, -0.042, 0]} ref={(g) => { if (g) middle.current[i] = g; }}>
             <mesh position={[0, -0.018, 0]} castShadow><capsuleGeometry args={[0.0075, 0.03, 5, 10]} /><meshStandardMaterial color={SKIN} roughness={0.58} /></mesh>
             <group position={[0, -0.036, 0]} ref={(g) => { if (g) tips.current[i] = g; }}>
@@ -228,32 +229,43 @@ function Body({ pose }: { pose: Pose }) {
         <mesh position={[0, -0.06, 0]} scale={[0.8, 0.5, 0.85]}><sphereGeometry args={[0.1, 32, 32]} /><meshStandardMaterial color={SKIN} roughness={0.5} /></mesh>
         {/* swept-up hair */}
         <mesh position={[0, 0.06, -0.01]} scale={[1.0, 0.75, 1.05]}><sphereGeometry args={[0.112, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} /><meshStandardMaterial color={HAIR} roughness={0.85} /></mesh>
-        <mesh position={[0.01, 0.1, 0.05]} rotation={[0.4, 0, -0.2]} scale={[1.3, 0.55, 0.8]}><sphereGeometry args={[0.06, 24, 24]} /><meshStandardMaterial color={HAIR} roughness={0.85} /></mesh>
+        <mesh position={[0.01, 0.1, 0.05]} rotation={[0.4, 0, -0.2]} scale={[1.3, 0.55, 0.8]}><sphereGeometry args={[0.06, 32, 24]} /><meshStandardMaterial color={HAIR} roughness={0.88} /></mesh>
+        {/* Ears and subtle cheek volumes give the face a clearer human silhouette. */}
+        {[-1, 1].map((x) => <group key={`ear-${x}`} position={[x * 0.105, -0.018, 0]}><mesh scale={[0.42, 0.72, 0.38]}><sphereGeometry args={[0.035, 20, 16]} /><meshPhysicalMaterial color={SKIN} roughness={0.58} /></mesh><mesh position={[0, 0, 0.009]} scale={[0.35, 0.5, 0.25]}><sphereGeometry args={[0.025, 16, 12]} /><meshStandardMaterial color="#a96e50" roughness={0.8} /></mesh></group>)}
+        {[-1, 1].map((x) => <mesh key={`cheek-${x}`} position={[x * 0.052, -0.035, 0.075]} scale={[0.55, 0.35, 0.22]}><sphereGeometry args={[0.045, 20, 16]} /><meshPhysicalMaterial color={SKIN} roughness={0.62} /></mesh>)}
         {[-1, 1].map((x) => (
           <group key={x}>
             <mesh position={[x * 0.1, -0.005, 0]} scale={[0.4, 1, 0.7]}><sphereGeometry args={[0.03, 16, 16]} /><meshStandardMaterial color={SKIN} /></mesh>
             <mesh position={[x * 0.036, 0.008, 0.096]}><sphereGeometry args={[0.014, 16, 16]} /><meshStandardMaterial color="#f4efe8" /></mesh>
-            <mesh position={[x * 0.036, 0.008, 0.108]}><sphereGeometry args={[0.007, 12, 12]} /><meshStandardMaterial color="#2a1c14" /></mesh>
+            <mesh position={[x * 0.036, 0.008, 0.108]}><sphereGeometry args={[0.007, 16, 12]} /><meshStandardMaterial color="#2a1c14" /></mesh>
+            <mesh position={[x * 0.036, 0.008, 0.114]}><sphereGeometry args={[0.0024, 12, 10]} /><meshBasicMaterial color="#ffffff" /></mesh>
+            <mesh position={[x * 0.036, 0.028, 0.101]} rotation={[0, 0, x * -0.08]}><capsuleGeometry args={[0.004, 0.025, 4, 8]} /><meshStandardMaterial color={HAIR} roughness={0.9} /></mesh>
             <mesh position={[x * 0.037, 0.035, 0.1]} rotation={[0, 0, x * -0.12]}><boxGeometry args={[0.032, 0.007, 0.01]} /><meshStandardMaterial color={HAIR} /></mesh>
           </group>
         ))}
         <mesh position={[0, -0.02, 0.11]} rotation={[0.3, 0, 0]}><coneGeometry args={[0.014, 0.04, 12]} /><meshStandardMaterial color={SKIN} /></mesh>
         <mesh position={[0, -0.065, 0.098]} rotation={[0, 0, Math.PI / 2]}><capsuleGeometry args={[0.006, 0.028, 4, 8]} /><meshStandardMaterial color="#9a5a48" /></mesh>
       </group>
-      <mesh position={[0, 1.5, 0]}><cylinderGeometry args={[0.045, 0.05, 0.08]} /><meshStandardMaterial color={SKIN} /></mesh>
+      <mesh position={[0, 1.505, 0]}><cylinderGeometry args={[0.048, 0.055, 0.12, 24]} /><meshPhysicalMaterial color={SKIN} roughness={0.5} /></mesh>
       {/* collar */}
       {[-1, 1].map((x) => <mesh key={x} position={[x * 0.035, 1.475, 0.045]} rotation={[0.5, 0, x * 0.6]}><boxGeometry args={[0.06, 0.04, 0.008]} /><Shirt /></mesh>)}
       {/* torso: shoulders to waist */}
-      <mesh position={[0, 1.24, 0]} scale={[1, 1, 0.62]} castShadow><capsuleGeometry args={[0.16, 0.26, 8, 24]} /><Shirt /></mesh>
+      <mesh position={[0, 1.235, 0]} scale={[1.08, 1.02, 0.68]} castShadow><capsuleGeometry args={[0.16, 0.27, 10, 28]} /><Shirt /></mesh>
+      {/* Soft shoulder and upper-chest volumes reduce the single-capsule look. */}
+      {[-1, 1].map((x) => <mesh key={`shoulder-${x}`} position={[x * 0.145, 1.385, 0]} rotation={[0, 0, x * -0.12]} castShadow><sphereGeometry args={[0.09, 24, 20]} /><Shirt /></mesh>)}
+      <mesh position={[0, 1.045, 0]} scale={[1.05, 0.72, 0.62]} castShadow><sphereGeometry args={[0.15, 24, 20]} /><meshStandardMaterial color="#343a42" roughness={0.88} /></mesh>
       {[-1, 1].map((x) => <mesh key={x} position={[x * 0.075, 1.3, 0.1]}><boxGeometry args={[0.07, 0.06, 0.012]} /><Shirt /></mesh>)}
       {[1.42, 1.34, 1.26, 1.18, 1.1].map((y) => <mesh key={y} position={[0, y, 0.1 + (y > 1.3 ? 0 : 0.003)]}><sphereGeometry args={[0.007, 8, 8]} /><meshStandardMaterial color="#ddd" metalness={0.6} /></mesh>)}
       <mesh position={[0, 0.98, 0]} scale={[1, 1, 0.65]}><cylinderGeometry args={[0.155, 0.15, 0.04, 24]} /><meshStandardMaterial color="#1f1a17" /></mesh>
       {/* jeans */}
       <mesh position={[0, 0.9, 0]} scale={[1, 1, 0.65]} castShadow><cylinderGeometry args={[0.15, 0.15, 0.14, 24]} /><meshStandardMaterial color={DENIM} roughness={0.9} /></mesh>
       {[-1, 1].map((x) => (
-        <group key={x}>
-          <mesh position={[x * 0.075, 0.45, 0]} rotation={[0, 0, x * 0.04]} castShadow><capsuleGeometry args={[0.065, 0.75, 8, 16]} /><meshStandardMaterial color={DENIM} roughness={0.9} /></mesh>
-          <mesh position={[x * 0.09, 0.03, 0.05]} scale={[1, 0.6, 1.9]} castShadow><sphereGeometry args={[0.06, 20, 20]} /><meshStandardMaterial color="#2b2622" roughness={0.7} /></mesh>
+        <group key={x} position={[x * 0.075, 0.48, 0]}>
+          <mesh position={[0, 0.17, 0]} rotation={[0, 0, x * 0.025]} castShadow><capsuleGeometry args={[0.062, 0.29, 8, 18]} /><meshStandardMaterial color={DENIM} roughness={0.88} /></mesh>
+          <mesh position={[0, -0.025, 0.012]} castShadow><sphereGeometry args={[0.058, 20, 16]} /><meshStandardMaterial color={DENIM} roughness={0.9} /></mesh>
+          <mesh position={[0, -0.235, 0]} rotation={[0, 0, x * -0.018]} castShadow><capsuleGeometry args={[0.049, 0.31, 8, 18]} /><meshStandardMaterial color={DENIM} roughness={0.88} /></mesh>
+          <mesh position={[0, -0.435, 0.055]} scale={[1.15, 0.55, 1.9]} castShadow><sphereGeometry args={[0.058, 24, 18]} /><meshStandardMaterial color="#20252b" roughness={0.72} /></mesh>
+          <mesh position={[0, -0.458, 0.05]} scale={[1.18, 0.18, 1.92]}><sphereGeometry args={[0.058, 24, 18]} /><meshStandardMaterial color="#111820" roughness={0.78} /></mesh>
         </group>
       ))}
       <ArmRig side={1} poseRef={poseRef} />
@@ -284,18 +296,21 @@ function spellingPose(letter: string | undefined): Pose {
 export default function Signer3D({ word, spelling, letter }: { word: string | null; spelling: boolean; letter?: string }) {
   const pose = spelling ? spellingPose(letter) : (word && POSES[word]) || IDLE_POSE;
   return (
-    <Canvas shadows camera={{ position: [0, 1.2, 4.6], fov: 30 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(0, 1.22, 0)}>
-      <color attach="background" args={["#f1e6d6"]} />
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[1.5, 3, 2]} intensity={2.1} castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
-      <directionalLight position={[-1.8, 2, 1]} intensity={0.65} color="#d9eaff" />
-      <pointLight position={[0, 1.8, 2.2]} intensity={0.35} distance={5} />
+    <Canvas shadows camera={{ position: [0, 1.22, 4.85], fov: 31 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(0, 1.12, 0)}>
+      <color attach="background" args={["#071522"]} />
+      <fog attach="fog" args={["#071522", 5.5, 10]} />
+      <ambientLight intensity={0.62} />
+      <directionalLight position={[2.2, 3.8, 3]} intensity={1.75} castShadow shadow-mapSize-width={1536} shadow-mapSize-height={1536} />
+      <directionalLight position={[-2.4, 2.4, 1.5]} intensity={0.9} color="#b9d9f4" />
+      <pointLight position={[0, 2.1, -1.8]} intensity={1.15} color="#5ab8d5" distance={6} />
+      <pointLight position={[0, 1.6, 2.5]} intensity={0.28} distance={5} />
       <Environment>
         <Lightformer intensity={2} position={[0, 5, 0]} scale={[10, 10, 1]} />
         <Lightformer intensity={1} color="#ffd9b0" position={[-5, 1, -1]} rotation-y={Math.PI / 2} scale={[20, 1, 1]} />
       </Environment>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.075, 0]} receiveShadow><circleGeometry args={[1.3, 72]} /><meshStandardMaterial color="#10283a" roughness={0.92} metalness={0.08} /></mesh>
       <group position={[0, -0.05, 0]}><Body pose={pose} /></group>
-      <ContactShadows position={[0, -0.05, 0]} opacity={0.3} blur={2} />
+      <ContactShadows position={[0, -0.06, 0]} opacity={0.38} blur={2.4} scale={3.2} far={2.2} />
     </Canvas>
   );
 }
