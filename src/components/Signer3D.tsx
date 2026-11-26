@@ -1,6 +1,7 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, ContactShadows, RoundedBox } from "@react-three/drei";
-import { useRef } from "react";
+import { Suspense, useRef } from "react";
+import HumanSigner from "./HumanSigner";
 import * as THREE from "three";
 
 // Arm pose: [shoulderX (neg = forward/up), shoulderZ (inward), elbowX (neg = bend)]
@@ -215,7 +216,7 @@ function ArmRig({ side, poseRef }: { side: 1 | -1; poseRef: React.MutableRefObje
   );
 }
 
-function Body({ pose }: { pose: Pose }) {
+export function Body({ pose }: { pose: Pose }) {
   const poseRef = useRef(pose);
   poseRef.current = pose;
   const head = useRef<THREE.Group>(null);
@@ -296,7 +297,7 @@ function spellingPose(letter: string | undefined): Pose {
 export default function Signer3D({ word, spelling, letter }: { word: string | null; spelling: boolean; letter?: string }) {
   const pose = spelling ? spellingPose(letter) : (word && POSES[word]) || IDLE_POSE;
   return (
-    <Canvas shadows camera={{ position: [0, 1.22, 4.85], fov: 31 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(0, 1.12, 0)}>
+    <Canvas shadows camera={{ position: [0, 1.25, 3.0], fov: 32 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(0, 1.1, 0)}>
       <color attach="background" args={["#071522"]} />
       <fog attach="fog" args={["#071522", 5.5, 10]} />
       <ambientLight intensity={0.62} />
@@ -309,8 +310,9 @@ export default function Signer3D({ word, spelling, letter }: { word: string | nu
         <Lightformer intensity={1} color="#ffd9b0" position={[-5, 1, -1]} rotation-y={Math.PI / 2} scale={[20, 1, 1]} />
       </Environment>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.075, 0]} receiveShadow><circleGeometry args={[1.3, 72]} /><meshStandardMaterial color="#10283a" roughness={0.92} metalness={0.08} /></mesh>
-      <group position={[0, -0.05, 0]}><Body pose={pose} /></group>
+      <Suspense fallback={null}><group position={[0, -0.05, 0]}><HumanSigner pose={pose} /></group></Suspense>
       <ContactShadows position={[0, -0.06, 0]} opacity={0.38} blur={2.4} scale={3.2} far={2.2} />
     </Canvas>
   );
 }
+// cam v2
