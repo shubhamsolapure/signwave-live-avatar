@@ -10,7 +10,45 @@ import type { Pose } from "./Signer3D";
 export const AXIS = { raise: "x", spread: "z", bend: "x", curl: "z" } as const;
 export const ARM_DOWN = 1.12; // radians from T-pose to relaxed arms
 const FINGERS = ["Index", "Middle", "Ring", "Pinky"] as const;
-const CURL: Record<Pose["shape"], number[]> = { open: [0, 0, 0, 0], fist: [1.4, 1.4, 1.4, 1.4], point: [0, 1.4, 1.4, 1.4], bunch: [0.8, 0.8, 0.8, 0.8] };
+
+// Each finger has its own MCP/PIP/DIP flexion profile. Values are deliberately
+// non-uniform so the fingers do not fold like four identical hinges.
+type FingerCurl = readonly [number, number, number];
+type HandShape = Record<(typeof FINGERS)[number], FingerCurl>;
+const CURL: Record<Pose["shape"], HandShape> = {
+  open: {
+    Index: [0.06, 0.08, 0.05],
+    Middle: [0.08, 0.1, 0.06],
+    Ring: [0.1, 0.12, 0.07],
+    Pinky: [0.13, 0.14, 0.08],
+  },
+  fist: {
+    Index: [0.95, 1.28, 0.82],
+    Middle: [1.08, 1.42, 0.94],
+    Ring: [1.12, 1.38, 0.98],
+    Pinky: [1.18, 1.3, 0.92],
+  },
+  point: {
+    Index: [0.04, 0.06, 0.04],
+    Middle: [1.08, 1.42, 0.94],
+    Ring: [1.12, 1.38, 0.98],
+    Pinky: [1.18, 1.3, 0.92],
+  },
+  bunch: {
+    Index: [0.62, 0.82, 0.54],
+    Middle: [0.72, 0.94, 0.62],
+    Ring: [0.78, 0.98, 0.68],
+    Pinky: [0.82, 0.92, 0.64],
+  },
+};
+
+// Slight natural fan when open; fingers draw closer together as they curl.
+const SPREAD: Record<Pose["shape"], number[]> = {
+  open: [-0.12, -0.035, 0.045, 0.14],
+  fist: [-0.035, -0.012, 0.018, 0.05],
+  point: [-0.12, -0.025, 0.035, 0.08],
+  bunch: [-0.07, -0.02, 0.025, 0.065],
+};
 
 type Rig = { bone: THREE.Bone; rest: THREE.Quaternion };
 
@@ -67,10 +105,28 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
       const fwd = (a[0] + dx);
       set(`${S}Arm`, down, 0, fwd * side, k);
       set(`${S}ForeArm`, 0, 0, (a[2] + de) * side * 0.9, k);
-      const curl = CURL[active ? p.shape : "open"];
-      FINGERS.forEach((f, i) => { for (let j = 1; j <= 3; j++) set(`${S}Hand${f}${j}`, 0, 0, (curl[i] ?? 0) * side * (j === 1 ? 0.7 : 1), k); });
-      const th = active && p.shape !== "open" ? 0.6 : 0;
-      for (let j = 1; j <= 3; j++) set(`${S}HandThumb${j}`, 0, th * side * 0.5, 0, k);
+      const shape = active ? p.shape : "open";
+      const curl = CURL[shape];
+      const spread = SPREAD[shape];
+      FINGERS.forEach((f, i) => {
+        const joints = curl[f];
+        // The metacarpal fans outward slightly; each knuckle then receives a
+        // different flexion amount for a softer, more human-looking curl.
+        set(`${S}Hand${f}1`, 0, spread[i] * side, joints[0] * side, k);
+        set(`${S}Hand${f}2`, 0, 0, joints[1] * side, k);
+        set(`${S}Hand${f}3`, 0, 0, joints[2] * side, k);
+      });
+
+      // Three thumb segments use a coordinated opposition arc. A relaxed
+      // thumb stays slightly away from the palm; closed shapes bring it across
+      // the fingers instead of simply rotating it in place.
+      const thumb = shape === "fist" ? [0.48, 0.78, 0.56]
+        : shape === "point" ? [0.28, 0.18, 0.12]
+        : shape === "bunch" ? [0.42, 0.58, 0.4]
+        : [0.12, 0.08, 0.05];
+      set(`${S}HandThumb1`, 0, side * (0.24 + thumb[0] * 0.55), side * thumb[0], k);
+      set(`${S}HandThumb2`, 0, side * (0.12 + thumb[1] * 0.3), side * thumb[1], k);
+      set(`${S}HandThumb3`, 0, side * thumb[2] * 0.35, side * thumb[2], k);
     }
     set("Head", Math.sin(t * 0.8) * 0.03, Math.sin(t * 0.5) * 0.05, 0, 0.1);
   });
