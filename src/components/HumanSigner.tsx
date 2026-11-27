@@ -24,7 +24,15 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
 
   useEffect(() => {
     root.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh) { o.castShadow = true; o.frustumCulled = false; }
+      if ((o as THREE.Mesh).isMesh) {
+        const mesh = o as THREE.Mesh;
+        mesh.castShadow = true; mesh.frustumCulled = false;
+        const mat = mesh.material as THREE.MeshStandardMaterial;
+        // Simple attire: no hat, plain shirt and trousers.
+        if (/Headwear/i.test(mat.name)) mesh.visible = false;
+        const plain = /Outfit_Top/i.test(mat.name) ? "#3b5f7a" : /Outfit_Bottom/i.test(mat.name) ? "#2b2f36" : /Footwear/i.test(mat.name) ? "#1d1d1f" : null;
+        if (plain) { const m = mat.clone(); m.map = null; m.color.set(plain); m.roughness = 0.85; m.needsUpdate = true; mesh.material = m; }
+      }
       if ((o as THREE.Bone).isBone) bones.current[o.name.replace(/^mixamorig:?/, "")] = { bone: o as THREE.Bone, rest: o.quaternion.clone() };
     });
     const box = new THREE.Box3().setFromObject(root);

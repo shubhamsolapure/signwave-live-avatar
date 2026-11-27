@@ -9,7 +9,8 @@ type Arm = [number, number, number];
 type Shape = "open" | "fist" | "point" | "bunch";
 export type Pose = { r: Arm; l: Arm; shape: Shape; move: "none" | "wave" | "nod" | "circle" | "tap" | "forward"; both?: boolean };
 
-const REST: Arm = [0, 0.08, -0.15];
+// Relaxed but visible: hands rest in front of the waist so they never hide behind the body.
+const REST: Arm = [-0.3, 0.2, -0.9];
 const P = (r: Arm, shape: Shape, move: Pose["move"], l: Arm = REST): Pose => ({ r, l, shape, move });
 const mirror = (a: Arm): Arm => [a[0], a[1], a[2]];
 

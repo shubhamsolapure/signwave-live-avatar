@@ -213,8 +213,18 @@ function Index() {
   useEffect(() => {
     if (!playing) return;
     if (idx >= frames.length - 1) return setPlaying(false);
-    const t = setTimeout(() => setIdx((i) => i + 1), (frames[idx]?.verified ? (mode === "hybrid" && frames[idx]?.video && !frames[idx]?.validatedAnimation ? 7000 : 2200) : 1100) * (slowPlayback ? 1.8 : 1));
-    return () => clearTimeout(t);
+    const isClip = mode === "hybrid" && !!frames[idx]?.video && !frames[idx]?.validatedAnimation;
+    // Official clips advance the moment YouTube reports "ended"; the timer is only a safety net.
+    const t = setTimeout(() => setIdx((i) => i + 1), (isClip ? 15000 : frames[idx]?.verified ? 2200 : 1100) * (slowPlayback ? 1.8 : 1));
+    const onMsg = (e: MessageEvent) => {
+      if (!isClip || typeof e.data !== "string" || !e.origin.includes("youtube")) return;
+      try {
+        const d = JSON.parse(e.data);
+        if (d?.info?.playerState === 0 || (d?.event === "onStateChange" && d?.info === 0)) setIdx((i) => i + 1);
+      } catch { /* ignore non-JSON */ }
+    };
+    window.addEventListener("message", onMsg);
+    return () => { clearTimeout(t); window.removeEventListener("message", onMsg); };
   }, [playing, idx, frames, mode, slowPlayback]);
 
   const go = (t = text) => {
@@ -288,8 +298,9 @@ function Index() {
           {mode === "hybrid" && !cur?.validatedAnimation ? (
             cur?.video ? (
               <div className="relative h-full w-full">
-                <iframe key={cur.video} className="h-full w-full" title={`ISL sign: ${cur.label}`} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
-                  src={`https://www.youtube-nocookie.com/embed/${cur.video}?autoplay=1&mute=1&loop=1&playlist=${cur.video}&controls=1&rel=0&modestbranding=1&playsinline=1`} />
+                <iframe key={cur.video + idx} className="h-full w-full" title={`ISL sign: ${cur.label}`} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
+                  onLoad={(e) => e.currentTarget.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: cur.video }), "*")}
+                  src={`https://www.youtube-nocookie.com/embed/${cur.video}?autoplay=1&mute=1&enablejsapi=1&controls=1&rel=0&modestbranding=1&playsinline=1`} />
                 <a className="absolute bottom-2 right-2 rounded-full bg-background/95 px-3 py-2 text-xs font-semibold text-foreground shadow" href={`https://www.youtube.com/watch?v=${cur.video}`} target="_blank" rel="noreferrer">Video not loading? Open on YouTube ↗</a>
               </div>
             ) : cur ? (
