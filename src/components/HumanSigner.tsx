@@ -124,19 +124,19 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
         const sourceMaterials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
         const styledMaterials = sourceMaterials.map((source) => {
           const mat = source as THREE.MeshStandardMaterial;
-          const partName = `${mesh.name} ${mat.name}`.toLowerCase().replace(/[_-]+/g, " ").replace(/\\s+/g, " ");
+          const partName = `${mesh.name} ${mat.name}`.toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ");
 
           // Remove hats/headwear so the model's existing hair is not covered.
-          if (/\\b(?:headwear|hat|cap)\\b/i.test(partName)) {
+          if (/\b(?:headwear|hat|cap)\b/i.test(partName)) {
             mesh.visible = false;
           }
 
           // Recognise common GLB and Ready Player Me naming variants.
-          const isHair = /hair|scalp|eyebrow|\\bbrow\\b|beard|moustache|mustache/i.test(partName);
-          const isShirt = /\\b(?:outfit\\s+)?top\\b|\\b(?:t[ -]?shirt|shirt|tee|hoodie|sweater|jacket)\\b|upper(?:\\s+body|\\s+clothing)?/i.test(partName);
-          const isTrousers = /\\b(?:outfit\\s+)?bottom\\b|\\b(?:trouser|pants?|jeans?|shorts|legwear)\\b|lower(?:\\s+body|\\s+clothing)?/i.test(partName);
+          const isHair = /hair|scalp|eyebrow|\bbrow\b|beard|moustache|mustache/i.test(partName);
+          const isShirt = /\b(?:outfit\s+)?top\b|\b(?:t[ -]?shirt|shirt|tee|hoodie|sweater|jacket)\b|upper(?:\s+body|\s+clothing)?/i.test(partName);
+          const isTrousers = /\b(?:outfit\s+)?bottom\b|\b(?:trouser|pants?|jeans?|shorts|legwear)\b|lower(?:\s+body|\s+clothing)?/i.test(partName);
           const isShoes = /footwear|shoes?|sneakers?|boots?/i.test(partName);
-          const isGenericGarment = /\\b(?:outfit|clothing|cloth|garment|apparel|fabric)\\b/i.test(partName);
+          const isGenericGarment = /\b(?:outfit|clothing|cloth|garment|apparel|fabric)\b/i.test(partName);
 
           // Some GLBs label garments only as "Outfit" or "Clothing".
           // Use the mesh's vertical position to distinguish torso from legs.
