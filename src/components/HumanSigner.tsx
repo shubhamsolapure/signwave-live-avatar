@@ -121,7 +121,7 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
           const partName = `${mesh.name} ${mat.name}`;
 
           // Remove hats/headwear so the model's hairstyle remains visible.
-          if (/(?:^|[_\\s])(?:headwear|hat)(?:$|[_\\s])/i.test(partName)) {
+          if (/Headwear|Hat/i.test(partName)) {
             mesh.visible = false;
           }
 
