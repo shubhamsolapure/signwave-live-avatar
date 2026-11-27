@@ -108,6 +108,9 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
   const tmp = useMemo(() => ({ q: new THREE.Quaternion(), e: new THREE.Euler(), v: new THREE.Vector3() }), []);
 
   useEffect(() => {
+    const modelBounds = new THREE.Box3().setFromObject(root);
+    const modelHeight = modelBounds.max.y - modelBounds.min.y;
+
     root.traverse((o) => {
       if ((o as THREE.Mesh).isMesh) {
         const mesh = o as THREE.Mesh;
@@ -115,30 +118,44 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
         mesh.receiveShadow = true;
         mesh.frustumCulled = false;
 
+        const partBounds = new THREE.Box3().setFromObject(mesh);
+        const centerY = partBounds.getCenter(new THREE.Vector3()).y;
+        const heightRatio = modelHeight > 0 ? (centerY - modelBounds.min.y) / modelHeight : 0.5;
         const sourceMaterials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
         const styledMaterials = sourceMaterials.map((source) => {
           const mat = source as THREE.MeshStandardMaterial;
-          const partName = `${mesh.name} ${mat.name}`;
+          const partName = `${mesh.name} ${mat.name}`.toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ");
 
-          // Remove hats/headwear so the model's hairstyle remains visible.
-          if (/Headwear|Hat/i.test(partName)) {
+          // Remove hats/headwear so the model's existing hair is not covered.
+          if (/\b(?:headwear|hat|cap)\b/i.test(partName)) {
             mesh.visible = false;
           }
 
-          // A clean everyday outfit: one plain T-shirt, dark trousers and shoes.
-          const color = /Outfit_Top|T-?Shirt|Shirt/i.test(partName) ? "#477b80"
-            : /Outfit_Bottom|Trouser|Pants|Jeans/i.test(partName) ? "#263442"
-            : /Footwear|Shoes/i.test(partName) ? "#20252b"
-            : /Hair|Scalp|Eyebrow|Beard/i.test(partName) ? "#24170f"
+          // Recognise common GLB and Ready Player Me naming variants.
+          const isHair = /hair|scalp|eyebrow|\bbrow\b|beard|moustache|mustache/i.test(partName);
+          const isShirt = /\b(?:outfit\s+)?top\b|\b(?:t[ -]?shirt|shirt|tee|hoodie|sweater|jacket)\b|upper(?:\s+body|\s+clothing)?/i.test(partName);
+          const isTrousers = /\b(?:outfit\s+)?bottom\b|\b(?:trouser|pants?|jeans?|shorts|legwear)\b|lower(?:\s+body|\s+clothing)?/i.test(partName);
+          const isShoes = /footwear|shoes?|sneakers?|boots?/i.test(partName);
+          const isGenericGarment = /\b(?:outfit|clothing|cloth|garment|apparel|fabric)\b/i.test(partName);
+
+          // Some GLBs label garments only as "Outfit" or "Clothing".
+          // Use the mesh's vertical position to distinguish torso from legs.
+          const color = isHair ? "#24170f"
+            : isShirt ? "#477b80"
+            : isTrousers ? "#263442"
+            : isShoes ? "#20252b"
+            : isGenericGarment && heightRatio > 0.56 ? "#477b80"
+            : isGenericGarment && heightRatio > 0.13 ? "#263442"
             : null;
 
           if (!color || !(mat instanceof THREE.MeshStandardMaterial)) return source;
 
           const next = mat.clone();
+          // Clear the source texture so the plain outfit colour is visible.
           next.map = null;
           next.color.set(color);
           next.metalness = 0;
-          next.roughness = /Hair|Scalp|Eyebrow|Beard/i.test(partName) ? 0.88 : 0.9;
+          next.roughness = isHair ? 0.88 : 0.92;
           next.needsUpdate = true;
           return next;
         });
