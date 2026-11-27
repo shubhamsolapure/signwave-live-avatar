@@ -239,7 +239,7 @@ function Index() {
     } else if (f.length === 0) {
       setTranslationNotice("No words could be processed. Try a short phrase using letters and spaces.");
     } else if (mode === "hybrid" && f.some((frame) => frame.video)) {
-      setTranslationNotice("Reference clips and avatar steps advance word by word. Use Pause or Slow playback when needed.");
+      setTranslationNotice("Each word's video plays in order. Use Pause or Slow playback if you need more time.");
     }
   };
 
@@ -275,7 +275,7 @@ function Index() {
   // Clear badge text based on status
   const badgeText = (() => {
     if (mode === "hybrid" && cur?.validatedAnimation) return "ISL animation reviewed and validated";
-    if (mode === "hybrid" && cur?.video) return "Reference clip + experimental 3D pose · compare sign and context";
+    if (mode === "hybrid" && cur?.video) return "Reference video · confirm the sign and context";
     if (mode === "avatar" && cur?.word && cur?.video) return "⚠️ Experimental 3D pose/fingerspelling · NOT validated ISL";
     if (mode === "avatar" && cur?.word) return "⚠️ Experimental 3D pose/fingerspelling · NOT verified ISL";
     return "🔤 Fingerspelling · handshape not validated";
@@ -287,111 +287,59 @@ function Index() {
         <header>
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">SignWave Live Avatar · ISL learning prototype</p>
           <h1 className="font-display text-4xl leading-tight text-foreground">Speak or type.<br />See it in sign.</h1>
-          <p className="mt-2 text-muted-foreground">Hybrid mode shows a signer reference beside the 3D avatar, so you can compare each available sign. The avatar motion remains experimental and is not motion-captured or expert-validated ISL. Word-by-word output is a learning aid, not a validated sentence-level ISL translation.</p>
+          <p className="mt-2 text-muted-foreground">The full-body 3D avatar has a procedural two-hand rig with individually articulated fingers. Its movements are illustrative prototypes, not motion-captured or expert-validated ISL. Reference videos are shown where mapped. Word-by-word output is a learning aid, not a validated sentence-level ISL translation.</p>
         </header>
 
         <div className="mode-toggle" role="group" aria-label="Choose sign display mode">
           <button className={mode === "avatar" ? "mode-on" : "mode-off"} onClick={() => setMode("avatar")}>3D Avatar (experimental)</button>
-          <button className={mode === "hybrid" ? "mode-on" : "mode-off"} onClick={() => setMode("hybrid")}>Hybrid: avatar + reference</button>
+          <button className={mode === "hybrid" ? "mode-on" : "mode-off"} onClick={() => setMode("hybrid")}>Official video reference</button>
         </div>
-        <div className={mode === "hybrid" ? "avatar-frame hybrid-frame" : "avatar-frame"}>
-          {mode === "hybrid" ? (
-            <div className="hybrid-view">
-              <section className="hybrid-panel" aria-label="ISL signer reference">
-                <div className="hybrid-panel-heading">
-                  <span>Signer reference</span>
-                  <span className="hybrid-panel-tag">VIDEO</span>
-                </div>
-                <div className="hybrid-media">
-                  {cur?.video ? (
-                    <div className="relative h-full w-full">
-                      <iframe
-                        key={cur.video + idx}
-                        className="h-full w-full"
-                        title={`ISL signer reference: ${cur.label}`}
-                        allow="autoplay; encrypted-media; picture-in-picture"
-                        allowFullScreen
-                        onLoad={(e) => e.currentTarget.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: cur.video }), "*")}
-                        src={`https://www.youtube-nocookie.com/embed/${cur.video}?autoplay=1&mute=1&enablejsapi=1&controls=1&rel=0&modestbranding=1&playsinline=1`}
-                      />
-                      <a
-                        className="absolute bottom-2 right-2 rounded-full bg-background/95 px-3 py-2 text-xs font-semibold text-foreground shadow"
-                        href={`https://www.youtube.com/watch?v=${cur.video}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Open reference clip ↗
-                      </a>
+        <div className="avatar-frame">
+          {mode === "hybrid" && !cur?.validatedAnimation ? (
+            cur?.video ? (
+              <div className="relative h-full w-full">
+                <iframe key={cur.video + idx} className="h-full w-full" title={`ISL sign: ${cur.label}`} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
+                  onLoad={(e) => e.currentTarget.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: cur.video }), "*")}
+                  src={`https://www.youtube-nocookie.com/embed/${cur.video}?autoplay=1&mute=1&enablejsapi=1&controls=1&rel=0&modestbranding=1&playsinline=1`} />
+                <a className="absolute bottom-2 right-2 rounded-full bg-background/95 px-3 py-2 text-xs font-semibold text-foreground shadow" href={`https://www.youtube.com/watch?v=${cur.video}`} target="_blank" rel="noreferrer">Video not loading? Open on YouTube ↗</a>
+              </div>
+            ) : cur ? (
+              <div className="relative h-full w-full">
+                {!cur.word ? (
+                  <>
+                    <iframe key="isl-alphabet-reference" className="h-full w-full" title="Human ISL alphabet fingerspelling reference"
+                      allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
+                      src={`https://www.youtube.com/embed/${ISLRTC_ALPHABET_VIDEO}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1`} />
+                    <a className="absolute top-3 right-3 rounded-full bg-background/95 px-3 py-2 text-xs font-semibold text-foreground shadow"
+                      href={`https://www.youtube.com/watch?v=${ISLRTC_ALPHABET_VIDEO}`} target="_blank" rel="noreferrer">Open alphabet lesson on YouTube ↗</a>
+                    <div className="absolute bottom-3 left-3 right-3 rounded-xl bg-background/95 p-3 text-center shadow">
+                      <span className="font-display text-4xl text-foreground">{cur.big}</span>
+                      <p className="font-semibold text-foreground">Human alphabet reference · spell “{cur.label.replace(/^Spell ["“]|["”] ·.*$/g, "")}”</p>
+                      <p className="text-sm text-muted-foreground">The letter shown is part of fingerspelling, not a word-level sign.</p>
                     </div>
-                  ) : cur && !cur.word ? (
-                    <div className="relative h-full w-full">
-                      <iframe
-                        key="isl-alphabet-reference"
-                        className="h-full w-full"
-                        title="Human ISL alphabet fingerspelling reference"
-                        allow="autoplay; encrypted-media; picture-in-picture"
-                        allowFullScreen
-                        src={`https://www.youtube.com/embed/${ISLRTC_ALPHABET_VIDEO}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&playsinline=1`}
-                      />
-                      <div className="absolute bottom-2 left-2 right-2 rounded-xl bg-background/95 p-2 text-center shadow">
-                        <span className="font-display text-3xl text-foreground">{cur.big}</span>
-                        <p className="text-xs font-semibold text-foreground">Alphabet reference · letter {cur.big}</p>
-                      </div>
-                    </div>
-                  ) : cur ? (
-                    <div className="flex h-full flex-col items-center justify-center gap-3 overflow-y-auto p-4 text-center">
-                      <span className="font-display text-5xl text-foreground">{cur.big}</span>
-                      <p className="font-semibold text-foreground">No direct reference clip is mapped for “{cur.word}” yet.</p>
-                      <p className="max-w-md text-sm text-muted-foreground">
-                        Check the official ISLRTC dictionary and compare the sign with a fluent signer before treating it as correct.
-                      </p>
-                      {cur.lookupUrl && (
-                        <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">
-                          Open official ISLRTC dictionary ↗
-                        </a>
-                      )}
-                      <a className="chip" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(cur.word)}`} target="_blank" rel="noreferrer">
-                        Search signer references ↗
-                      </a>
-                      <a className="chip" href="https://def.org.in/def-isl-app/" target="_blank" rel="noreferrer">
-                        Explore DEF-ISL reference ↗
-                      </a>
-                    </div>
-                  ) : (
-                    <div className="grid h-full place-items-center p-5 text-center text-sm text-muted-foreground">
-                      Enter text or use the microphone to see a matching signer reference here.
-                    </div>
-                  )}
-                </div>
-                <p className="hybrid-panel-note">Use this recording to check the handshape, orientation, location and movement.</p>
-              </section>
-
-              <section className="hybrid-panel" aria-label="Experimental 3D avatar">
-                <div className="hybrid-panel-heading">
-                  <span>3D avatar</span>
-                  <span className="hybrid-panel-tag">EXPERIMENTAL</span>
-                </div>
-                <div className="hybrid-avatar-canvas">
-                  <ClientOnly fallback={<div className="grid h-full place-items-center p-4 text-center text-sm text-muted-foreground">Preparing the 3D view…</div>}>
-                    <Suspense fallback={<div className="grid h-full place-items-center p-4 text-center text-sm text-muted-foreground">Loading 3D avatar…</div>}>
-                      <Signer3D word={cur?.word ?? null} spelling={!!cur && !cur.word} letter={cur?.big} />
-                    </Suspense>
-                  </ClientOnly>
-                  {cur && !cur.word && <span className="avatar-letter">{cur.big}</span>}
-                </div>
-                <p className="hybrid-panel-note">This generated motion is a prototype, not a validated ISL translation.</p>
-              </section>
-            </div>
+                  </>
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center gap-3 p-4 text-center">
+                    <span className="font-display text-6xl text-foreground">{cur.big}</span>
+                    <p className="font-semibold text-foreground">Look up “{cur.word}” in the official dictionary</p>
+                    <p className="max-w-md text-sm text-muted-foreground">No locally mapped video clip is available yet. Open the official ISLRTC dictionary entry, then add a clip only after its exact meaning and usage are checked.</p>
+                    {cur.lookupUrl && <a className="chip" href={cur.lookupUrl} target="_blank" rel="noreferrer">{cur.lookupUrl.endsWith("/islrtc/") ? "Search the official ISLRTC dictionary ↗" : `Open official ISLRTC entry for “${cur.word}” ↗`}</a>}
+                    <a className="chip" href={`https://www.youtube.com/@deafenabledfoundation/search?query=${encodeURIComponent(cur.word)}`} target="_blank" rel="noreferrer">Explore additional signer references ↗</a>
+                    <a className="chip" href="https://def.org.in/def-isl-app/" target="_blank" rel="noreferrer">Explore DEF-ISL reference ↗</a>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Select a message to explore a reference video or an experimental 3D gesture</div>
+            )
           ) : (
-            <div className="relative h-full w-full">
-              <ClientOnly fallback={null}>
-                <Suspense fallback={<div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Loading 3D avatar…</div>}>
-                  <Signer3D word={cur?.word ?? null} spelling={!!cur && !cur.word} letter={cur?.big} />
-                </Suspense>
-              </ClientOnly>
-              {cur && !cur.word && <span className="avatar-letter">{cur.big}</span>}
-            </div>
+          <ClientOnly fallback={null}>
+            <Suspense fallback={<div className="grid h-full place-items-center p-6 text-center text-muted-foreground">Loading 3D avatar…</div>}>
+              <Signer3D word={cur?.word ?? null} spelling={!!cur && !cur.word} letter={cur?.big} />
+            </Suspense>
+          </ClientOnly>
           )}
+          {mode === "avatar" && cur && !cur.word && <span className="avatar-letter">{cur.big}</span>}
         </div>
 
         <section className="stage" aria-live="polite">
