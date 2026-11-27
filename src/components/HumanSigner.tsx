@@ -50,6 +50,51 @@ const SPREAD: Record<Pose["shape"], number[]> = {
   bunch: [-0.07, -0.02, 0.025, 0.065],
 };
 
+
+type MotionOffset = { dx: number; dz: number; elbow: number; wristX: number; wristY: number; wristZ: number };
+
+// Smooth, bounded movement paths. These add motion to the prototype poses;
+// they are not recordings or validated ISL sign trajectories.
+function motionOffset(move: Pose["move"], time: number): MotionOffset {
+  const value: MotionOffset = { dx: 0, dz: 0, elbow: 0, wristX: 0, wristY: 0, wristZ: 0 };
+
+  if (move === "wave") {
+    const wave = Math.sin(time * 4.6);
+    value.dz = wave * 0.2;
+    value.dx = Math.sin(time * 2.3) * 0.055;
+    value.elbow = -0.08 + Math.sin(time * 4.6 + 0.55) * 0.075;
+    value.wristY = wave * 0.1;
+    value.wristZ = Math.cos(time * 4.6) * 0.16;
+  } else if (move === "nod") {
+    const nod = Math.sin(time * 4.8);
+    value.dx = Math.sin(time * 2.4) * 0.035;
+    value.elbow = -0.12 + nod * 0.14;
+    value.wristX = nod * 0.07;
+    value.wristZ = Math.cos(time * 4.8) * 0.035;
+  } else if (move === "tap") {
+    // A soft contact pulse with a short hold, rather than a sharp sine twitch.
+    const tap = Math.pow(Math.max(0, Math.sin(time * 4.2)), 1.7);
+    value.dx = -tap * 0.07;
+    value.elbow = -tap * 0.22;
+    value.wristX = -tap * 0.075;
+  } else if (move === "circle") {
+    const angle = time * 3.2;
+    value.dx = Math.sin(angle) * 0.11;
+    value.dz = Math.cos(angle) * 0.11;
+    value.elbow = Math.sin(angle + 0.75) * 0.09;
+    value.wristX = Math.sin(angle + 1) * 0.075;
+    value.wristZ = Math.cos(angle) * 0.09;
+  } else if (move === "forward") {
+    const reach = 0.5 - Math.cos(time * 2.8) * 0.5;
+    value.dx = -reach * 0.14;
+    value.dz = Math.sin(time * 1.4) * 0.025;
+    value.elbow = -reach * 0.12;
+    value.wristX = -reach * 0.055;
+  }
+
+  return value;
+}
+
 type Rig = { bone: THREE.Bone; rest: THREE.Quaternion };
 
 export default function HumanSigner({ pose }: { pose: Pose }) {
@@ -58,6 +103,8 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
   const bones = useRef<Record<string, Rig>>({});
   const poseRef = useRef(pose);
   poseRef.current = pose;
+  const motionKeyRef = useRef("");
+  const motionStartRef = useRef(0);
   const tmp = useMemo(() => ({ q: new THREE.Quaternion(), e: new THREE.Euler() }), []);
 
   useEffect(() => {
@@ -79,56 +126,73 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
     root.position.y = -box.min.y * (1.7 / h);
   }, [root]);
 
-  function set(name: string, x: number, y: number, z: number, k: number) {
+  function set(name: string, x: number, y: number, z: number, blend: number) {
     const r = bones.current[name];
     if (!r) return;
     tmp.e.set(x, y, z);
     tmp.q.setFromEuler(tmp.e).premultiply(r.rest);
-    r.bone.quaternion.slerp(tmp.q, k);
+    r.bone.quaternion.slerp(tmp.q, blend);
   }
 
-  useFrame(({ clock }) => {
-    const p = poseRef.current, t = clock.elapsedTime, k = 0.16;
+  useFrame(({ clock }, delta) => {
+    const p = poseRef.current;
+    const t = clock.elapsedTime;
+    const motionKey = [p.move, p.shape, p.both ? "both" : "right", ...p.r, ...p.l].join("|");
+    if (motionKey !== motionKeyRef.current) {
+      motionKeyRef.current = motionKey;
+      motionStartRef.current = t;
+    }
+    const motionTime = Math.max(0, t - motionStartRef.current);
+
+    // Exponential damping is frame-rate independent and gives every joint a
+    // soft ease-in/ease-out when changing words or handshapes.
+    const blend = 1 - Math.exp(-Math.min(delta, 0.05) * 11);
+    const breath = Math.sin(t * 1.35);
+
+    // Subtle torso breathing and counter-sway make the signer less rigid.
+    set("Spine", breath * 0.012, Math.sin(t * 0.65) * 0.012, 0, blend * 0.8);
+    set("Spine1", breath * 0.008, Math.sin(t * 0.65 + 0.25) * 0.016, 0, blend * 0.8);
+    set("Spine2", 0, Math.sin(t * 0.65 + 0.45) * 0.01, 0, blend * 0.8);
+
     for (const side of [1, -1] as const) {
       const S = side === 1 ? "Right" : "Left";
       const active = side === 1 || p.both;
       const a = side === 1 ? p.r : p.l;
       const m = active ? p.move : "none";
-      let dx = 0, dz = 0, de = 0;
-      if (m === "wave") dz = Math.sin(t * 9) * 0.28;
-      if (m === "nod") de = Math.sin(t * 8) * 0.3;
-      if (m === "tap") de = Math.abs(Math.sin(t * 7)) * -0.28;
-      if (m === "circle") { dx = Math.sin(t * 5) * 0.2; dz = Math.cos(t * 5) * 0.2; }
-      if (m === "forward") dx = -((Math.sin(t * 3) + 1) / 2) * 0.45;
-      // Arm: from T-pose drop down, then raise forward (shoulderX) and bring inward (shoulderZ).
-      const down = ARM_DOWN - (a[1] + dz);
-      const fwd = (a[0] + dx);
-      set(`${S}Arm`, down, 0, fwd * side, k);
-      set(`${S}ForeArm`, 0, 0, (a[2] + de) * side * 0.9, k);
+      const motion = motionOffset(m, motionTime);
+
+      // Shoulder, elbow and wrist now share one coordinated motion path.
+      const down = ARM_DOWN - (a[1] + motion.dz);
+      const forward = a[0] + motion.dx;
+      set(`${S}Arm`, down, 0, forward * side, blend);
+      set(`${S}ForeArm`, motion.wristX * 0.18, motion.wristY * 0.2, (a[2] + motion.elbow) * side * 0.9, blend);
+      set(`${S}Hand`, motion.wristX, motion.wristY * side, motion.wristZ * side, blend);
+
       const shape = active ? p.shape : "open";
       const curl = CURL[shape];
       const spread = SPREAD[shape];
       FINGERS.forEach((f, i) => {
         const joints = curl[f];
-        // The metacarpal fans outward slightly; each knuckle then receives a
-        // different flexion amount for a softer, more human-looking curl.
-        set(`${S}Hand${f}1`, 0, spread[i] * side, joints[0] * side, k);
-        set(`${S}Hand${f}2`, 0, 0, joints[1] * side, k);
-        set(`${S}Hand${f}3`, 0, 0, joints[2] * side, k);
+        set(`${S}Hand${f}1`, 0, spread[i] * side, joints[0] * side, blend);
+        set(`${S}Hand${f}2`, 0, 0, joints[1] * side, blend);
+        set(`${S}Hand${f}3`, 0, 0, joints[2] * side, blend);
       });
 
-      // Three thumb segments use a coordinated opposition arc. A relaxed
-      // thumb stays slightly away from the palm; closed shapes bring it across
-      // the fingers instead of simply rotating it in place.
+      // Coordinated three-joint thumb opposition follows the selected handshape.
       const thumb = shape === "fist" ? [0.48, 0.78, 0.56]
         : shape === "point" ? [0.28, 0.18, 0.12]
         : shape === "bunch" ? [0.42, 0.58, 0.4]
         : [0.12, 0.08, 0.05];
-      set(`${S}HandThumb1`, 0, side * (0.24 + thumb[0] * 0.55), side * thumb[0], k);
-      set(`${S}HandThumb2`, 0, side * (0.12 + thumb[1] * 0.3), side * thumb[1], k);
-      set(`${S}HandThumb3`, 0, side * thumb[2] * 0.35, side * thumb[2], k);
+      set(`${S}HandThumb1`, 0, side * (0.24 + thumb[0] * 0.55), side * thumb[0], blend);
+      set(`${S}HandThumb2`, 0, side * (0.12 + thumb[1] * 0.3), side * thumb[1], blend);
+      set(`${S}HandThumb3`, 0, side * thumb[2] * 0.35, side * thumb[2], blend);
     }
-    set("Head", Math.sin(t * 0.8) * 0.03, Math.sin(t * 0.5) * 0.05, 0, 0.1);
+
+    // A restrained head response keeps attention near the active signing space.
+    const headNod = p.move === "tap" || p.move === "nod" ? Math.sin(motionTime * 2.4) * 0.018 : 0;
+    const headTurn = p.move === "wave" || p.move === "circle" ? Math.sin(motionTime * 0.55) * 0.025 : Math.sin(t * 0.35) * 0.012;
+    set("Neck", headNod * 0.45, headTurn * 0.35, Math.sin(t * 0.45) * 0.008, blend * 0.65);
+    set("Head", headNod, headTurn, Math.sin(t * 0.7) * 0.012, blend * 0.7);
   });
 
   return <primitive object={root} />;
