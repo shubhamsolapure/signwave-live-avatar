@@ -315,4 +315,3 @@ export default function Signer3D({ word, spelling, letter }: { word: string | nu
     </Canvas>
   );
 }
-// cam v2

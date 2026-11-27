@@ -3,12 +3,12 @@ import { useGLTF } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
-import model from "@/assets/signer_michelle.glb.asset.json";
+import model from "@/assets/signer_man.glb.asset.json";
 import type { Pose } from "./Signer3D";
 
 // Axis mapping for Mixamo rigs (bone Y runs along the limb). Tuned visually.
 export const AXIS = { raise: "x", spread: "z", bend: "x", curl: "z" } as const;
-export const ARM_DOWN = 1.25; // radians from T-pose to relaxed arms
+export const ARM_DOWN = 1.12; // radians from T-pose to relaxed arms
 const FINGERS = ["Index", "Middle", "Ring", "Pinky"] as const;
 const CURL: Record<Pose["shape"], number[]> = { open: [0, 0, 0, 0], fist: [1.4, 1.4, 1.4, 1.4], point: [0, 1.4, 1.4, 1.4], bunch: [0.8, 0.8, 0.8, 0.8] };
 
@@ -70,4 +70,3 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
   return <primitive object={root} />;
 }
 useGLTF.preload(model.url);
-// rig v2
