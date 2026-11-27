@@ -95,7 +95,7 @@ function motionOffset(move: Pose["move"], time: number): MotionOffset {
   return value;
 }
 
-type Rig = { bone: THREE.Bone; rest: THREE.Quaternion };
+type Rig = { bone: THREE.Bone; rest: THREE.Quaternion; position: THREE.Vector3 };
 
 export default function HumanSigner({ pose }: { pose: Pose }) {
   const { scene } = useGLTF(model.url);
@@ -105,25 +105,64 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
   poseRef.current = pose;
   const motionKeyRef = useRef("");
   const motionStartRef = useRef(0);
-  const tmp = useMemo(() => ({ q: new THREE.Quaternion(), e: new THREE.Euler() }), []);
+  const tmp = useMemo(() => ({ q: new THREE.Quaternion(), e: new THREE.Euler(), v: new THREE.Vector3() }), []);
 
   useEffect(() => {
     root.traverse((o) => {
       if ((o as THREE.Mesh).isMesh) {
         const mesh = o as THREE.Mesh;
-        mesh.castShadow = true; mesh.frustumCulled = false;
-        const mat = mesh.material as THREE.MeshStandardMaterial;
-        // Simple attire: no hat, plain shirt and trousers.
-        if (/Headwear/i.test(mat.name)) mesh.visible = false;
-        const plain = /Outfit_Top/i.test(mat.name) ? "#3b5f7a" : /Outfit_Bottom/i.test(mat.name) ? "#2b2f36" : /Footwear/i.test(mat.name) ? "#1d1d1f" : null;
-        if (plain) { const m = mat.clone(); m.map = null; m.color.set(plain); m.roughness = 0.85; m.needsUpdate = true; mesh.material = m; }
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        mesh.frustumCulled = false;
+
+        const sourceMaterials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+        const styledMaterials = sourceMaterials.map((source) => {
+          const mat = source as THREE.MeshStandardMaterial;
+          const partName = `${mesh.name} ${mat.name}`;
+
+          // Remove hats/headwear so the model's hairstyle remains visible.
+          if (/Headwear|Hat/i.test(partName)) {
+            mesh.visible = false;
+          }
+
+          // A clean everyday outfit: one plain T-shirt, dark trousers and shoes.
+          const color = /Outfit_Top|T-?Shirt|Shirt/i.test(partName) ? "#477b80"
+            : /Outfit_Bottom|Trouser|Pants|Jeans/i.test(partName) ? "#263442"
+            : /Footwear|Shoes/i.test(partName) ? "#20252b"
+            : /Hair|Scalp|Eyebrow|Beard/i.test(partName) ? "#24170f"
+            : null;
+
+          if (!color || !(mat instanceof THREE.MeshStandardMaterial)) return source;
+
+          const next = mat.clone();
+          next.map = null;
+          next.color.set(color);
+          next.metalness = 0;
+          next.roughness = /Hair|Scalp|Eyebrow|Beard/i.test(partName) ? 0.88 : 0.9;
+          next.needsUpdate = true;
+          return next;
+        });
+
+        mesh.material = Array.isArray(mesh.material) ? styledMaterials : styledMaterials[0];
       }
-      if ((o as THREE.Bone).isBone) bones.current[o.name.replace(/^mixamorig:?/, "")] = { bone: o as THREE.Bone, rest: o.quaternion.clone() };
+
+      if ((o as THREE.Bone).isBone) {
+        const bone = o as THREE.Bone;
+        bones.current[bone.name.replace(/^mixamorig:?/, "")] = {
+          bone,
+          rest: bone.quaternion.clone(),
+          position: bone.position.clone(),
+        };
+      }
     });
+
     const box = new THREE.Box3().setFromObject(root);
     const h = box.max.y - box.min.y;
-    root.scale.setScalar(1.7 / h);
-    root.position.y = -box.min.y * (1.7 / h);
+    if (h > 0) {
+      const scale = 1.7 / h;
+      root.scale.setScalar(scale);
+      root.position.y = -box.min.y * scale;
+    }
   }, [root]);
 
   function set(name: string, x: number, y: number, z: number, blend: number) {
@@ -132,6 +171,13 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
     tmp.e.set(x, y, z);
     tmp.q.setFromEuler(tmp.e).premultiply(r.rest);
     r.bone.quaternion.slerp(tmp.q, blend);
+  }
+
+  function move(name: string, x: number, y: number, z: number, blend: number) {
+    const r = bones.current[name];
+    if (!r) return;
+    tmp.v.set(x, y, z).add(r.position);
+    r.bone.position.lerp(tmp.v, blend);
   }
 
   useFrame(({ clock }, delta) => {
@@ -147,12 +193,15 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
     // Exponential damping is frame-rate independent and gives every joint a
     // soft ease-in/ease-out when changing words or handshapes.
     const blend = 1 - Math.exp(-Math.min(delta, 0.05) * 11);
-    const breath = Math.sin(t * 1.35);
+    const breath = Math.sin(t * 1.25);
+    const idleSway = Math.sin(t * 0.55);
 
-    // Subtle torso breathing and counter-sway make the signer less rigid.
-    set("Spine", breath * 0.012, Math.sin(t * 0.65) * 0.012, 0, blend * 0.8);
-    set("Spine1", breath * 0.008, Math.sin(t * 0.65 + 0.25) * 0.016, 0, blend * 0.8);
-    set("Spine2", 0, Math.sin(t * 0.65 + 0.45) * 0.01, 0, blend * 0.8);
+    // A tiny hip shift and chest expansion keep the standing body from looking frozen.
+    move("Hips", Math.sin(t * 0.38) * 0.003, Math.sin(t * 1.25) * 0.004, 0, blend * 0.5);
+    set("Hips", 0, idleSway * 0.012, 0, blend * 0.55);
+    set("Spine", breath * 0.018, idleSway * 0.016, 0, blend * 0.8);
+    set("Spine1", breath * 0.012, Math.sin(t * 0.55 + 0.25) * 0.019, 0, blend * 0.8);
+    set("Spine2", breath * 0.006, Math.sin(t * 0.55 + 0.45) * 0.012, 0, blend * 0.8);
 
     for (const side of [1, -1] as const) {
       const S = side === 1 ? "Right" : "Left";
@@ -160,6 +209,9 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
       const a = side === 1 ? p.r : p.l;
       const m = active ? p.move : "none";
       const motion = motionOffset(m, motionTime);
+
+      // Clavicle/shoulder follows the reach before the upper arm, when the rig has that bone.
+      set(`${S}Shoulder`, motion.dz * 0.08, 0, -motion.dx * side * 0.08, blend * 0.7);
 
       // Shoulder, elbow and wrist now share one coordinated motion path.
       const down = ARM_DOWN - (a[1] + motion.dz);
