@@ -176,7 +176,7 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
   function move(name: string, x: number, y: number, z: number, blend: number) {
     const r = bones.current[name];
     if (!r) return;
-    tmp.v.copy(r.position).add(tmp.v.set(x, y, z));
+    tmp.v.set(x, y, z).add(r.position);
     r.bone.position.lerp(tmp.v, blend);
   }
 
