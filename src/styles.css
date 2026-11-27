@@ -207,3 +207,94 @@
 @media (prefers-reduced-motion: reduce) {
   .app-shell *, .app-shell *::before, .app-shell *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+
+/* Side-by-side hybrid signing view: authentic reference beside the experimental avatar. */
+.app-shell > .avatar-frame.hybrid-frame {
+  height: clamp(390px, 48vw, 560px);
+  min-height: 390px;
+  padding: .65rem;
+  background: var(--color-muted);
+}
+.hybrid-view {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: .7rem;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.hybrid-panel {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: .5rem;
+  padding: .6rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-card);
+}
+.hybrid-panel-heading {
+  display: flex;
+  min-height: 1.65rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  color: var(--color-foreground);
+  font-size: .82rem;
+  font-weight: 700;
+}
+.hybrid-panel-tag {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--color-muted);
+  padding: .2rem .5rem;
+  color: var(--color-muted-foreground);
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+.hybrid-media,
+.hybrid-avatar-canvas {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: .75rem;
+  background: var(--color-muted);
+}
+.hybrid-media iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.hybrid-avatar-canvas {
+  background: #071522;
+}
+.hybrid-panel-note {
+  flex: 0 0 auto;
+  margin: 0;
+  color: var(--color-muted-foreground);
+  font-size: .68rem;
+  line-height: 1.35;
+}
+@media (max-width: 760px) {
+  .app-shell > .avatar-frame.hybrid-frame {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: 0;
+    background: transparent;
+  }
+  .hybrid-view {
+    height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(260px, 70vw) minmax(320px, 82vw);
+    gap: .85rem;
+  }
+}
