@@ -213,12 +213,7 @@ function Index() {
   useEffect(() => {
     if (!playing) return;
     if (idx >= frames.length - 1) return setPlaying(false);
-    // Keep reference videos on screen long enough to watch; the user advances manually.
-    if (mode === "hybrid" && frames[idx]?.video && !frames[idx]?.validatedAnimation) {
-      setPlaying(false);
-      return;
-    }
-    const t = setTimeout(() => setIdx((i) => i + 1), (frames[idx]?.verified ? (mode === "hybrid" && !frames[idx]?.validatedAnimation ? 5000 : 2200) : 1100) * (slowPlayback ? 1.8 : 1));
+    const t = setTimeout(() => setIdx((i) => i + 1), (frames[idx]?.verified ? (mode === "hybrid" && frames[idx]?.video && !frames[idx]?.validatedAnimation ? 7000 : 2200) : 1100) * (slowPlayback ? 1.8 : 1));
     return () => clearTimeout(t);
   }, [playing, idx, frames, mode, slowPlayback]);
 
@@ -234,7 +229,7 @@ function Index() {
     } else if (f.length === 0) {
       setTranslationNotice("No words could be processed. Try a short phrase using letters and spaces.");
     } else if (mode === "hybrid" && f.some((frame) => frame.video)) {
-      setTranslationNotice("Reference videos stay on screen until you select Next, so you have time to watch them.");
+      setTranslationNotice("Each word's video plays in order. Use Pause or Slow playback if you need more time.");
     }
   };
 

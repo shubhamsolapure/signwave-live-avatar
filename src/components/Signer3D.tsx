@@ -297,7 +297,7 @@ function spellingPose(letter: string | undefined): Pose {
 export default function Signer3D({ word, spelling, letter }: { word: string | null; spelling: boolean; letter?: string }) {
   const pose = spelling ? spellingPose(letter) : (word && POSES[word]) || IDLE_POSE;
   return (
-    <Canvas shadows camera={{ position: [0, 1.25, 3.0], fov: 32 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(0, 1.1, 0)}>
+    <Canvas shadows camera={{ position: [0, 1.0, 3.9], fov: 32 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(0, 0.9, 0)}>
       <color attach="background" args={["#071522"]} />
       <fog attach="fog" args={["#071522", 5.5, 10]} />
       <ambientLight intensity={0.62} />

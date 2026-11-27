@@ -57,8 +57,8 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
       // Arm: from T-pose drop down, then raise forward (shoulderX) and bring inward (shoulderZ).
       const down = ARM_DOWN - (a[1] + dz);
       const fwd = (a[0] + dx);
-      set(`${S}Arm`, down, 0, -fwd * side, k);
-      set(`${S}ForeArm`, 0, 0, (a[2] + de) * -side * 0.9, k);
+      set(`${S}Arm`, down, 0, fwd * side, k);
+      set(`${S}ForeArm`, 0, 0, (a[2] + de) * side * 0.9, k);
       const curl = CURL[active ? p.shape : "open"];
       FINGERS.forEach((f, i) => { for (let j = 1; j <= 3; j++) set(`${S}Hand${f}${j}`, 0, 0, (curl[i] ?? 0) * side * (j === 1 ? 0.7 : 1), k); });
       const th = active && p.shape !== "open" ? 0.6 : 0;
