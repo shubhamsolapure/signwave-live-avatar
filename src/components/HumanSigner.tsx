@@ -103,6 +103,8 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
   const bones = useRef<Record<string, Rig>>({});
   const poseRef = useRef(pose);
   poseRef.current = pose;
+  const motionKeyRef = useRef("");
+  const motionStartRef = useRef(0);
   const tmp = useMemo(() => ({ q: new THREE.Quaternion(), e: new THREE.Euler() }), []);
 
   useEffect(() => {
@@ -135,6 +137,13 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
   useFrame(({ clock }, delta) => {
     const p = poseRef.current;
     const t = clock.elapsedTime;
+    const motionKey = [p.move, p.shape, p.both ? "both" : "right", ...p.r, ...p.l].join("|");
+    if (motionKey !== motionKeyRef.current) {
+      motionKeyRef.current = motionKey;
+      motionStartRef.current = t;
+    }
+    const motionTime = Math.max(0, t - motionStartRef.current);
+
     // Exponential damping is frame-rate independent and gives every joint a
     // soft ease-in/ease-out when changing words or handshapes.
     const blend = 1 - Math.exp(-Math.min(delta, 0.05) * 11);
@@ -150,7 +159,7 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
       const active = side === 1 || p.both;
       const a = side === 1 ? p.r : p.l;
       const m = active ? p.move : "none";
-      const motion = motionOffset(m, t);
+      const motion = motionOffset(m, motionTime);
 
       // Shoulder, elbow and wrist now share one coordinated motion path.
       const down = ARM_DOWN - (a[1] + motion.dz);
@@ -180,8 +189,8 @@ export default function HumanSigner({ pose }: { pose: Pose }) {
     }
 
     // A restrained head response keeps attention near the active signing space.
-    const headNod = p.move === "tap" || p.move === "nod" ? Math.sin(t * 2.4) * 0.018 : 0;
-    const headTurn = p.move === "wave" || p.move === "circle" ? Math.sin(t * 0.55) * 0.025 : Math.sin(t * 0.35) * 0.012;
+    const headNod = p.move === "tap" || p.move === "nod" ? Math.sin(motionTime * 2.4) * 0.018 : 0;
+    const headTurn = p.move === "wave" || p.move === "circle" ? Math.sin(motionTime * 0.55) * 0.025 : Math.sin(t * 0.35) * 0.012;
     set("Neck", headNod * 0.45, headTurn * 0.35, Math.sin(t * 0.45) * 0.008, blend * 0.65);
     set("Head", headNod, headTurn, Math.sin(t * 0.7) * 0.012, blend * 0.7);
   });
